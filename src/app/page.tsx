@@ -4,46 +4,12 @@ import { motion } from "framer-motion";
 import { ChevronDown, MapPin, Phone, Clock } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import Navbar from "../components/Navbar";
 
 export default function Home() {
   return (
     <div className="bg-stone-950 text-stone-100 min-h-screen font-sans selection:bg-amber-700 selection:text-white">
-      {/* Navigation */}
-      <nav className="fixed w-full z-50 px-6 py-6 transition-all duration-300 bg-gradient-to-b from-black/80 to-transparent">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-2xl font-serif tracking-widest uppercase text-amber-500"
-          >
-            Le Bon Goût
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="hidden md:flex gap-8 text-sm tracking-widest uppercase"
-          >
-            <a href="#nosotros" className="hover:text-amber-500 transition-colors">Nosotros</a>
-            <a href="#horario" className="hover:text-amber-500 transition-colors">Horario</a>
-            <a href="#menu" className="hover:text-amber-500 transition-colors">Carta</a>
-            <a href="#eventos" className="hover:text-amber-500 transition-colors">Eventos</a>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            <Link
-              href="/reservas"
-              className="border border-amber-500 text-amber-500 px-6 py-2 text-sm uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-colors inline-block"
-            >
-              RESERVAS
-            </Link>
-          </motion.div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -99,12 +65,14 @@ export default function Home() {
             <p className="text-stone-400 leading-relaxed mb-8 text-lg">
               En Le Bon Goût creemos que cenar es una forma de arte. Cada plato está elaborado con pasión, precisión y los mejores ingredientes de temporada provenientes de artesanos locales. Nuestro equipo culinario transforma recetas tradicionales en obras maestras modernas.
             </p>
-            <button className="border-b border-amber-500 text-amber-500 pb-1 uppercase tracking-widest text-sm hover:text-white hover:border-white transition-colors">
-              ¿Quieres formar parte de nosotros?
-            </button>
-            <button className="border-b border-amber-500 text-amber-500 pb-1 uppercase tracking-widest text-sm hover:text-white hover:border-white transition-colors">
-              ¿Ya formas parte de nosotros?
-            </button>
+            <div className="flex flex-col md:flex-row gap-6 mt-4">
+              <button className="border-b border-amber-500 text-amber-500 pb-1 uppercase tracking-widest text-sm hover:text-white hover:border-white transition-colors">
+                ¿Quieres formar parte de nosotros?
+              </button>
+              <Link href="/login" className="border-b border-amber-500 text-amber-500 pb-1 uppercase tracking-widest text-sm hover:text-white hover:border-white transition-colors">
+                ¿Ya formas parte de nosotros?
+              </Link>
+            </div>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -177,6 +145,23 @@ export default function Home() {
               View Full Menu
             </button>
           </div>
+        </div>
+      </section>
+
+      {/* Eventos Section */}
+      <section id="eventos" className="py-32 px-6 bg-stone-950">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-amber-500 tracking-[0.2em] uppercase text-sm mb-4">Celebraciones</h2>
+          <h3 className="text-4xl md:text-5xl font-serif mb-8">Eventos Inolvidables</h3>
+          <p className="text-stone-400 max-w-2xl mx-auto mb-12 text-lg">
+            Descubra nuestros exclusivos espacios diseñados para hacer de sus eventos privados y corporativos una experiencia verdaderamente memorable. Desde salones privados íntimos hasta la majestuosidad de nuestra Casona Completa.
+          </p>
+          <Link
+            href="/eventos"
+            className="border-b border-amber-500 text-amber-500 pb-1 uppercase tracking-widest text-sm hover:text-white hover:border-white transition-colors"
+          >
+            Saber más sobre eventos
+          </Link>
         </div>
       </section>
 
