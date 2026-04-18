@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ChevronDown, MapPin, Phone, Clock } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -24,18 +25,23 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="hidden md:flex gap-8 text-sm tracking-widest uppercase"
           >
-            <a href="#about" className="hover:text-amber-500 transition-colors">Nosotros</a>
-            <a href="#menu" className="hover:text-amber-500 transition-colors">Menu</a>
-            <a href="#reservations" className="hover:text-amber-500 transition-colors">Reservations</a>
+            <a href="#nosotros" className="hover:text-amber-500 transition-colors">Nosotros</a>
+            <a href="#horario" className="hover:text-amber-500 transition-colors">Horario</a>
+            <a href="#menu" className="hover:text-amber-500 transition-colors">Carta</a>
+            <a href="#eventos" className="hover:text-amber-500 transition-colors">Eventos</a>
           </motion.div>
-          <motion.button
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="border border-amber-500 text-amber-500 px-6 py-2 text-sm uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-colors"
           >
-            Book
-          </motion.button>
+            <Link
+              href="/reservas"
+              className="border border-amber-500 text-amber-500 px-6 py-2 text-sm uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-colors inline-block"
+            >
+              RESERVAS
+            </Link>
+          </motion.div>
         </div>
       </nav>
 
@@ -80,7 +86,7 @@ export default function Home() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-32 px-6 bg-stone-950">
+      <section id="nosotros" className="py-32 px-6 bg-stone-950">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -93,9 +99,12 @@ export default function Home() {
             <p className="text-stone-400 leading-relaxed mb-8 text-lg">
               En Le Bon Goût creemos que cenar es una forma de arte. Cada plato está elaborado con pasión, precisión y los mejores ingredientes de temporada provenientes de artesanos locales. Nuestro equipo culinario transforma recetas tradicionales en obras maestras modernas.
             </p>
-            {/*<button className="border-b border-amber-500 text-amber-500 pb-1 uppercase tracking-widest text-sm hover:text-white hover:border-white transition-colors">
-              Discover Our Story
-            </button>*/}
+            <button className="border-b border-amber-500 text-amber-500 pb-1 uppercase tracking-widest text-sm hover:text-white hover:border-white transition-colors">
+              ¿Quieres formar parte de nosotros?
+            </button>
+            <button className="border-b border-amber-500 text-amber-500 pb-1 uppercase tracking-widest text-sm hover:text-white hover:border-white transition-colors">
+              ¿Ya formas parte de nosotros?
+            </button>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
