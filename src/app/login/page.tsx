@@ -16,9 +16,9 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   const credentials: Credentials = {
-    "m@res.com": "m1",
-    "c@res.com": "m2",
-    "a@res.com": "m3",
+    "mesero@res.com": "m12345",
+    "chef@res.com": "c12345",
+    "admin@res.com": "a12345",
   };
 
   const handleLogin = (e: React.FormEvent) => {
