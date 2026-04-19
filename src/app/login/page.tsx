@@ -67,31 +67,30 @@ export default function LoginPage() {
 
   return (
     <div className="bg-[#0B0B0C] min-h-screen font-sans selection:bg-[#C6A96B] selection:text-white flex flex-col">
-      <nav className="w-full p-6 absolute top-0 z-10">
-        <div className="max-w-7xl mx-auto flex items-center">
+      <nav className="w-full p-4 md:p-6 absolute top-0 z-10">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-stone-400 hover:text-[#C6A96B] transition-colors">
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm uppercase tracking-widest">Volver</span>
+            <span className="text-sm uppercase tracking-widest hidden sm:inline">Volver</span>
           </Link>
-          <div className="mx-auto pr-24">
-            <Link href="/" className="text-xl font-serif tracking-widest uppercase text-[#C6A96B]">
-              Le Bon Gout
-            </Link>
-          </div>
+          <Link href="/" className="text-lg md:text-xl font-serif tracking-widest uppercase text-[#C6A96B]">
+            Le Bon Gout
+          </Link>
+          <div className="w-16 hidden sm:block" />
         </div>
       </nav>
 
-      <div className="flex-1 flex items-center justify-center p-6 relative z-0">
+      <div className="flex-1 flex items-center justify-center p-4 md:p-6 relative z-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="w-full max-w-md bg-[#121214] p-10 border border-stone-800 shadow-2xl relative overflow-hidden"
+          className="w-full max-w-md bg-[#121214] p-6 md:p-10 border border-stone-800 shadow-2xl relative overflow-hidden"
         >
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#C6A96B] to-transparent opacity-50" />
 
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-serif text-white mb-2">
+          <div className="text-center mb-8 md:mb-10">
+            <h2 className="text-2xl md:text-3xl font-serif text-white mb-2">
               {isRecovering ? "Recuperar Acceso" : "Iniciar Sesion"}
             </h2>
             <p className="text-stone-400 text-sm">
@@ -102,7 +101,7 @@ export default function LoginPage() {
           </div>
 
           {!isRecovering ? (
-            <form onSubmit={handleLogin} className="space-y-6">
+            <form onSubmit={handleLogin} className="space-y-5 md:space-y-6">
               <div>
                 <label className="block text-stone-400 text-xs uppercase tracking-widest mb-2">
                   Correo Electronico
@@ -125,7 +124,7 @@ export default function LoginPage() {
                     onClick={() => setIsRecovering(true)}
                     className="text-[#C6A96B] text-xs hover:text-white transition-colors"
                   >
-                    Olvidaste tu contrasena?
+                    Olvidaste?
                   </button>
                 </div>
                 <input
@@ -147,7 +146,7 @@ export default function LoginPage() {
               </button>
             </form>
           ) : (
-            <form onSubmit={handleRecover} className="space-y-6">
+            <form onSubmit={handleRecover} className="space-y-5 md:space-y-6">
               <div>
                 <label className="block text-stone-400 text-xs uppercase tracking-widest mb-2">
                   Correo Electronico

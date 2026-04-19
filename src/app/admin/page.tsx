@@ -54,32 +54,40 @@ export default function AdminPage() {
     }
   };
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div className="bg-[#0B0B0C] min-h-screen text-stone-100 font-sans flex">
-      <aside className="w-64 bg-[#121214] border-r border-stone-800 flex flex-col h-screen">
+      {/* Mobile Menu Button */}
+      <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-[#121214] border border-stone-800 rounded">
+        <LayoutDashboard className="w-6 h-6 text-[#C6A96B]" />
+      </button>
+
+      {/* Sidebar - Desktop */}
+      <aside className="hidden lg:flex w-64 bg-[#121214] border-r border-stone-800 flex-col h-screen fixed left-0 top-0">
         <div className="p-6 border-b border-stone-800">
           <h2 className="text-xl font-serif text-[#C6A96B] uppercase tracking-widest">Le Bon Gout</h2>
           <p className="text-xs text-stone-500 mt-1">Admin Panel</p>
         </div>
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {[
-            { id: "dashboard", icon: LayoutDashboard, label: "Metricas en Vivo" },
+            { id: "dashboard", icon: LayoutDashboard, label: "Metricas" },
             { id: "inventario", icon: Package, label: "Inventario" },
-            { id: "personal", icon: Users, label: "Control de Personal" },
-            { id: "carta", icon: BookOpen, label: "Editor de Carta" },
+            { id: "personal", icon: Users, label: "Personal" },
+            { id: "carta", icon: BookOpen, label: "Editor Carta" },
             { id: "reservas", icon: Calendar, label: "Reservas" },
             { id: "proveedores", icon: Truck, label: "Proveedores" },
-            { id: "mermas", icon: AlertTriangle, label: "Reporte de Mermas" },
+            { id: "mermas", icon: AlertTriangle, label: "Mermas" },
           ].map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded text-sm uppercase tracking-widest transition-colors ${
+              onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3 py-2 lg:py-3 rounded text-sm uppercase tracking-widest transition-colors ${
                 activeTab === item.id ? "bg-[#C6A96B]/10 text-[#C6A96B] border border-[#C6A96B]/30" : "text-stone-400 hover:text-white hover:bg-stone-900"
               }`}
             >
               <item.icon className="w-4 h-4" />
-              {item.label}
+              <span className="text-xs">{item.label}</span>
             </button>
           ))}
         </nav>
@@ -91,12 +99,54 @@ export default function AdminPage() {
         </div>
       </aside>
 
-      <main className="flex-1 h-screen overflow-y-auto bg-[#0B0B0C]">
-        <header className="flex justify-between items-center p-8">
-          <h1 className="text-2xl font-serif text-white uppercase tracking-widest">{activeTab.replace("-", " ")}</h1>
-          <p className="text-sm text-stone-400">Bienvenido, {adminName}</p>
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div className="lg:hidden fixed inset-0 z-40 bg-black/80" onClick={() => setSidebarOpen(false)}>
+          <aside className="w-64 bg-[#121214] border-r border-stone-800 flex flex-col h-full" onClick={e => e.stopPropagation()}>
+            <div className="p-6 border-b border-stone-800 flex justify-between items-center">
+              <h2 className="text-xl font-serif text-[#C6A96B] uppercase tracking-widest">Le Bon Gout</h2>
+              <button onClick={() => setSidebarOpen(false)} className="text-stone-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+              {[
+                { id: "dashboard", icon: LayoutDashboard, label: "Metricas" },
+                { id: "inventario", icon: Package, label: "Inventario" },
+                { id: "personal", icon: Users, label: "Personal" },
+                { id: "carta", icon: BookOpen, label: "Editor Carta" },
+                { id: "reservas", icon: Calendar, label: "Reservas" },
+                { id: "proveedores", icon: Truck, label: "Proveedores" },
+                { id: "mermas", icon: AlertTriangle, label: "Mermas" },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded text-sm uppercase tracking-widest transition-colors ${
+                    activeTab === item.id ? "bg-[#C6A96B]/10 text-[#C6A96B] border border-[#C6A96B]/30" : "text-stone-400 hover:text-white hover:bg-stone-900"
+                  }`}
+                >
+                  <item.icon className="w-4 h-4" />
+                  {item.label}
+                </button>
+              ))}
+            </nav>
+            <div className="p-4 border-t border-stone-800">
+              <Link href="/login" className="flex items-center justify-center gap-2 w-full px-4 py-3 text-sm text-stone-400 hover:text-white uppercase tracking-widest transition-colors">
+                <LogOut className="w-4 h-4" />
+                Cerrar Sesion
+              </Link>
+            </div>
+          </aside>
+        </div>
+      )}
+
+      <main className="flex-1 lg:ml-64 h-screen overflow-y-auto bg-[#0B0B0C]">
+        <header className="flex justify-between items-center p-4 lg:p-8">
+          <h1 className="text-xl lg:text-2xl font-serif text-white uppercase tracking-widest ml-12 lg:ml-0">{activeTab.replace("-", " ")}</h1>
+          <p className="text-sm text-stone-400 hidden sm:block">Bienvenido, {adminName}</p>
         </header>
-        <div className="px-8 pb-8">
+        <div className="px-4 lg:px-8 pb-8">
           <AnimatePresence mode="wait">
             <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
               {renderContent()}

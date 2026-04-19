@@ -60,62 +60,62 @@ export default function MeseroPage() {
     setShowModal(false);
   };
 
-  return (
-    <div className="bg-[#0B0B0C] min-h-screen text-stone-100 flex font-sans">
+return (
+    <div className="bg-[#0B0B0C] min-h-screen text-stone-100 flex flex-col lg:flex-row font-sans">
       
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Header */}
-        <header className="flex justify-between items-center p-6 border-b border-stone-800 bg-[#121214]">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 lg:p-6 border-b border-stone-800 bg-[#121214] gap-4">
           <div>
-            <h1 className="text-2xl font-serif text-[#C6A96B]">Le Bon Goût</h1>
+            <h1 className="text-xl lg:text-2xl font-serif text-[#C6A96B]">Le Bon Gout</h1>
             <p className="text-sm text-stone-400">Bienvenido, {waiterName}</p>
           </div>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <div className="flex items-center gap-2 flex-1 sm:flex-none">
               <label className="text-sm uppercase tracking-widest text-stone-400">Mesa:</label>
               <select 
                 value={selectedTable}
                 onChange={(e) => setSelectedTable(e.target.value)}
-                className="bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2 focus:outline-none focus:border-[#C6A96B]"
+                className="bg-[#0B0B0C] border border-stone-800 text-white px-3 py-2 focus:outline-none focus:border-[#C6A96B] flex-1 sm:flex-none"
               >
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                  <option key={n} value={n}>Mesa {n}</option>
+                  <option key={n} value={n}>{n}</option>
                 ))}
               </select>
             </div>
-            <Link href="/login" className="flex items-center gap-2 text-stone-400 hover:text-white transition-colors">
+            <Link href="/login" className="flex items-center gap-2 text-stone-400 hover:text-white transition-colors p-2">
               <LogOut className="w-5 h-5" />
-              <span className="text-sm uppercase tracking-widest hidden md:inline">Salir</span>
+              <span className="text-sm uppercase tracking-widest hidden lg:inline">Salir</span>
             </Link>
           </div>
         </header>
 
         {/* Catalog */}
-        <main className="flex-1 overflow-y-auto p-6">
-          <h2 className="text-amber-500 tracking-[0.2em] uppercase text-sm mb-6">Catálogo de Productos</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+          <h2 className="text-amber-500 tracking-[0.2em] uppercase text-sm mb-4 lg:mb-6">Catalogo de Productos</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
             {PRODUCTS.map((product) => (
               <motion.div 
                 key={product.id}
                 whileHover={{ scale: 1.02 }}
                 className={`bg-[#121214] border ${product.stock === 0 ? 'border-red-900/50 opacity-70' : 'border-stone-800'} rounded-lg overflow-hidden flex flex-col`}
               >
-                <div className="relative h-48 w-full">
+                <div className="relative h-40 lg:h-48 w-full">
                   <Image src={product.img} alt={product.name} fill className="object-cover" />
-                  <div className="absolute top-3 right-3">
-                    <span className={`text-xs font-bold px-3 py-1 rounded-full ${product.stock > 0 ? 'bg-black/80 text-[#C6A96B] border border-[#C6A96B]' : 'bg-red-900/80 text-white border border-red-500'}`}>
-                      {product.stock > 0 ? `Stock: ${product.stock}` : 'Agotado'}
+                  <div className="absolute top-2 lg:top-3 right-2 lg:right-3">
+                    <span className={`text-xs font-bold px-2 lg:px-3 py-1 rounded-full ${product.stock > 0 ? 'bg-black/80 text-[#C6A96B] border border-[#C6A96B]' : 'bg-red-900/80 text-white border border-red-500'}`}>
+                      {product.stock > 0 ? `${product.stock}` : 'Agot'}
                     </span>
                   </div>
                 </div>
-                <div className="p-4 flex-1 flex flex-col justify-between">
+                <div className="p-3 lg:p-4 flex-1 flex flex-col justify-between">
                   <div>
-                    <h3 className="font-serif text-xl mb-1">{product.name}</h3>
-                    <p className="text-sm text-stone-400 mb-4">{product.desc}</p>
+                    <h3 className="font-serif text-lg lg:text-xl mb-1">{product.name}</h3>
+                    <p className="text-xs lg:text-sm text-stone-400 mb-2 lg:mb-4">{product.desc}</p>
                   </div>
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="text-lg font-medium text-[#C6A96B]">$\${product.price}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-medium text-[#C6A96B]">${product.price}</span>
                     <button 
                       onClick={() => addToOrder(product.id)}
                       disabled={product.stock === 0}
@@ -131,12 +131,12 @@ export default function MeseroPage() {
         </main>
       </div>
 
-      {/* Sidebar / Voucher */}
-      <aside className="w-80 bg-[#121214] border-l border-stone-800 flex flex-col h-screen">
+      {/* Sidebar / Voucher - Desktop */}
+      <aside className="hidden lg:flex w-80 bg-[#121214] border-l border-stone-800 flex-col h-screen">
         <div className="p-6 border-b border-stone-800 bg-black/20">
           <h2 className="text-xl font-serif text-[#C6A96B] flex items-center gap-2">
             <ShoppingBag className="w-5 h-5" />
-            Voucher Mesa {selectedTable}
+            Mesa {selectedTable}
           </h2>
         </div>
         
@@ -157,7 +157,7 @@ export default function MeseroPage() {
                 >
                   <div className="flex-1">
                     <h4 className="text-sm font-medium">{item.name}</h4>
-                    <p className="text-xs text-[#C6A96B]">$\${item.price} x {item.qty}</p>
+                    <p className="text-xs text-[#C6A96B]">${item.price} x {item.qty}</p>
                   </div>
                   <div className="flex items-center gap-2 ml-4">
                     <button onClick={() => removeFromOrder(item.id)} className="p-1 bg-stone-800 hover:bg-stone-700 rounded text-stone-300">
@@ -179,9 +179,9 @@ export default function MeseroPage() {
         </div>
 
         <div className="p-6 border-t border-stone-800 bg-black/20">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-4 lg:mb-6">
             <span className="text-stone-400 uppercase tracking-widest text-sm">Total</span>
-            <span className="text-2xl font-serif text-[#C6A96B]">$\${total}</span>
+            <span className="text-2xl font-serif text-[#C6A96B]">${total}</span>
           </div>
           <button 
             onClick={() => setShowModal(true)}
@@ -193,6 +193,24 @@ export default function MeseroPage() {
           </button>
         </div>
       </aside>
+
+      {/* Mobile Bottom Bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#121214] border-t border-stone-800 p-4 flex justify-between items-center z-40">
+        <div className="flex items-center gap-3">
+          <ShoppingBag className="w-5 h-5 text-[#C6A96B]" />
+          <div>
+            <p className="text-xs text-stone-400">Mesa {selectedTable}</p>
+            <p className="text-lg font-serif text-[#C6A96B]">${total}</p>
+          </div>
+        </div>
+        <button 
+          onClick={() => setShowModal(true)}
+          disabled={order.length === 0}
+          className="bg-[#C6A96B] hover:bg-white text-black font-medium uppercase tracking-widest text-sm px-6 py-3 transition-colors disabled:opacity-50 disabled:hover:bg-[#C6A96B] flex items-center gap-2"
+        >
+          <Send className="w-4 h-4" />
+        </button>
+      </div>
 
       {/* Confirmation Modal */}
       <AnimatePresence>
