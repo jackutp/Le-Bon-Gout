@@ -64,7 +64,7 @@ export default function CocinaPage() {
       if (order.id === orderId) {
         return {
           ...order,
-          items: order.items.map(item => 
+          items: order.items.map(item =>
             item.id === itemId ? { ...item, completed: !item.completed } : item
           )
         };
@@ -74,7 +74,7 @@ export default function CocinaPage() {
   };
 
   const markOrderServed = (orderId: string) => {
-    setOrders(orders.map(order => 
+    setOrders(orders.map(order =>
       order.id === orderId ? { ...order, status: "served" } : order
     ));
   };
@@ -114,7 +114,7 @@ export default function CocinaPage() {
             ) : (
               activeOrders.map((order) => {
                 const isAllCompleted = order.items.every(item => item.completed);
-                
+
                 return (
                   <motion.div
                     key={order.id}
@@ -140,23 +140,21 @@ export default function CocinaPage() {
                     {/* Order Items */}
                     <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-2 lg:space-y-3">
                       {order.items.map((item) => (
-                        <div 
+                        <div
                           key={item.id}
                           onClick={() => toggleItemCompletion(order.id, item.id)}
-                          className={`flex items-start gap-2 lg:gap-4 p-2 lg:p-3 rounded cursor-pointer transition-all border ${
-                            item.completed 
-                              ? 'bg-[#C6A96B]/10 border-[#C6A96B]/30 opacity-60' 
+                          className={`flex items-start gap-2 lg:gap-4 p-2 lg:p-3 rounded cursor-pointer transition-all border ${item.completed
+                              ? 'bg-[#C6A96B]/10 border-[#C6A96B]/30 opacity-60'
                               : 'bg-[#0B0B0C] border-stone-800 hover:border-stone-600'
-                          }`}
+                            }`}
                         >
-                          <div className={`mt-0.5 lg:mt-1 w-4 lg:w-5 h-4 lg:h-5 rounded border flex items-center justify-center shrink-0 ${
-                            item.completed ? 'bg-[#C6A96B] border-[#C6A96B] text-black' : 'border-stone-600'
-                          }`}>
+                          <div className={`mt-0.5 lg:mt-1 w-4 lg:w-5 h-4 lg:h-5 rounded border flex items-center justify-center shrink-0 ${item.completed ? 'bg-[#C6A96B] border-[#C6A96B] text-black' : 'border-stone-600'
+                            }`}>
                             {item.completed && <CheckCircle className="w-3 lg:w-4 h-3 lg:h-4" />}
                           </div>
                           <div className="flex-1">
                             <p className={`font-medium text-sm lg:text-base ${item.completed ? 'line-through text-stone-400' : 'text-stone-200'}`}>
-                              <span className="text-[#C6A96B] mr-1 lg:mr-2">{item.qty}x</span> 
+                              <span className="text-[#C6A96B] mr-1 lg:mr-2">{item.qty}x</span>
                               {item.name}
                             </p>
                             {item.notes && (

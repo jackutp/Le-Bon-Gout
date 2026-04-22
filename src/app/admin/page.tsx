@@ -9,24 +9,21 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 
-type Staff = { id: number; name: string; email: string; role: "Mesero" | "Cocinero"; ordersToday?: number; avgTime?: string };
-type MenuItem = { id: number; name: string; price: number; desc: string; category: "Plato" | "Bebida" | "Postre"; img: string };
+import { useOrders } from "@/context/OrderContext";
+
+type Staff = { id: number; name: string; email: string; role: "Mesero" | "Cocinero"; password: string; notes: string; ordersToday?: number; avgTime?: string };
+type MenuItem = { id: number; name: string; price: number; desc: string; category: "Plato" | "Bebida" | "Postre"; img: string; inStock: number };
 type Waste = { id: number; item: string; qty: string; reason: string; date: string };
 type Reservation = { id: number; name: string; details: string; date: string };
 
 const INITIAL_STAFF: Staff[] = [
-  { id: 1, name: "Jean-Paul", email: "jean@lebongout.com", role: "Mesero", ordersToday: 24 },
-  { id: 2, name: "Maria Garcia", email: "maria@lebongout.com", role: "Mesero", ordersToday: 18 },
-  { id: 3, name: "Chef Isabelle", email: "isabelle@lebongout.com", role: "Cocinero", avgTime: "14m" },
-  { id: 4, name: "Carlos Ruiz", email: "carlos@lebongout.com", role: "Cocinero", avgTime: "16m" },
+  { id: 1, name: "Jean-Paul", email: "jean@lebongout.com", role: "Mesero", password: "", notes: "", ordersToday: 24 },
+  { id: 2, name: "Maria Garcia", email: "maria@lebongout.com", role: "Mesero", password: "", notes: "", ordersToday: 18 },
+  { id: 3, name: "Chef Isabelle", email: "isabelle@lebongout.com", role: "Cocinero", password: "", notes: "", avgTime: "14m" },
+  { id: 4, name: "Carlos Ruiz", email: "carlos@lebongout.com", role: "Cocinero", password: "", notes: "", avgTime: "16m" },
 ];
 
-const INITIAL_MENU: MenuItem[] = [
-  { id: 1, name: "Filet Mignon", price: 45, desc: "Puré con trufa, espárragos", category: "Plato", img: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800" },
-  { id: 2, name: "Ravioli de Langosta", price: 38, desc: "Crema de azafrán, caviar", category: "Plato", img: "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&q=80&w=800" },
-  { id: 3, name: "Chablis Grand Cru", price: 120, desc: "Vino blanco, 2019", category: "Bebida", img: "https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&q=80&w=800" },
-  { id: 4, name: "Mousse de Chocolate", price: 18, desc: "Lámina de oro, frambuesa", category: "Postre", img: "https://images.unsplash.com/photo-1574966739987-65e38f2cea46?auto=format&fit=crop&q=80&w=800" },
-];
+
 
 const INITIAL_WASTE: Waste[] = [
   { id: 1, item: "Mousse de Chocolate", qty: "1 porción", reason: "Se cayó al emplatar", date: "Hoy, 19:15" },
@@ -219,15 +216,9 @@ function DashboardView() {
 }
 
 // --- INVENTORY ---
-const INVENTORY = [
-  { id: 1, name: "Trufa Negra", stock: 2, unit: "kg" },
-  { id: 2, name: "Caviar Beluga", stock: 5, unit: "latas" },
-  { id: 3, name: "Filete de Res", stock: 24, unit: "kg" },
-  { id: 4, name: "Azafran", stock: 8, unit: "g" },
-  { id: 5, name: "Vino Chablis", stock: 15, unit: "botellas" },
-];
-
 function InventoryView() {
+  const { inventory } = useOrders();
+  
   return (
     <div className="bg-[#121214] border border-stone-800 rounded overflow-hidden">
       <table className="w-full text-left">
@@ -240,7 +231,7 @@ function InventoryView() {
           </tr>
         </thead>
         <tbody className="divide-y divide-stone-800 text-sm">
-          {INVENTORY.map((item) => (
+          {inventory.map((item) => (
             <tr key={item.id} className={item.stock < 10 ? "bg-red-900/10" : ""}>
               <td className="p-4">{item.name}</td>
               <td className="p-4 text-stone-400">{item.unit}</td>
@@ -266,20 +257,20 @@ function InventoryView() {
 // --- STAFF ---
 function StaffView() {
   const [staff, setStaff] = useState<Staff[]>(INITIAL_STAFF);
-  const [newStaff, setNewStaff] = useState({ name: "", email: "", role: "Mesero" as "Mesero" | "Cocinero" });
+  const [newStaff, setNewStaff] = useState({ name: "", email: "", role: "Mesero" as "Mesero" | "Cocinero", password: "", notes: "" });
 
   const addStaff = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newStaff.name || !newStaff.email) return;
     setStaff([...staff, { ...newStaff, id: Date.now() }]);
-    setNewStaff({ name: "", email: "", role: "Mesero" });
+    setNewStaff({ name: "", email: "", role: "Mesero", password: "", notes: "" });
   };
 
   const meseros = staff.filter(s => s.role === "Mesero");
   const cocineros = staff.filter(s => s.role === "Cocinero");
 
   return (
-    <div className="grid grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="bg-[#121214] border border-stone-800 rounded p-6">
         <h2 className="text-xl font-serif text-[#C6A96B] mb-6">Nuevo Personal</h2>
         <form onSubmit={addStaff} className="space-y-4">
@@ -299,6 +290,23 @@ function StaffView() {
               value={newStaff.email}
               onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
               className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2 focus:border-[#C6A96B]"
+            />
+          </div>
+          <div>
+            <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Contrasena</label>
+            <input
+              type="password"
+              value={newStaff.password}
+              onChange={(e) => setNewStaff({ ...newStaff, password: e.target.value })}
+              className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2 focus:border-[#C6A96B]"
+            />
+          </div>
+          <div>
+            <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Notas / Permisos</label>
+            <textarea
+              value={newStaff.notes}
+              onChange={(e) => setNewStaff({ ...newStaff, notes: e.target.value })}
+              className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2 focus:border-[#C6A96B] h-24 resize-none"
             />
           </div>
           <div>
@@ -325,7 +333,7 @@ function StaffView() {
             <div key={s.id} className="flex justify-between items-center p-3 border border-stone-800 rounded">
               <div>
                 <p className="text-sm">{s.name}</p>
-                <p className="text-xs text-stone-500">{s.ordersToday} pedidos hoy</p>
+                <p className="text-xs text-stone-500">{s.ordersToday || 0} pedidos hoy</p>
               </div>
               <span className="text-[#C6A96B] text-sm">Activo</span>
             </div>
@@ -355,7 +363,7 @@ function StaffView() {
 
 // --- MENU ---
 function MenuView() {
-  const [menu, setMenu] = useState<MenuItem[]>(INITIAL_MENU);
+  const { menuItems, addMenuItem, updateMenuItem, deleteMenuItem } = useOrders();
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [newItem, setNewItem] = useState({ name: "", price: "", desc: "", category: "Plato" as "Plato" | "Bebida" | "Postre", img: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800" });
@@ -367,16 +375,16 @@ function MenuView() {
     e.preventDefault();
     if (!newItem.name || !newItem.price) return;
     if (editingItem) {
-      setMenu(menu.map(m => m.id === editingItem.id ? { ...m, name: newItem.name, price: parseInt(newItem.price), desc: newItem.desc, category: newItem.category, img: newItem.img } : m));
+      updateMenuItem(editingItem.id, { ...editingItem, name: newItem.name, price: parseInt(newItem.price), desc: newItem.desc, category: newItem.category, img: newItem.img, inStock: editingItem.inStock });
     } else {
-      setMenu([...menu, { id: Date.now(), name: newItem.name, price: parseInt(newItem.price), desc: newItem.desc, category: newItem.category, img: newItem.img }]);
+      addMenuItem({ id: Date.now(), name: newItem.name, price: parseInt(newItem.price), desc: newItem.desc, category: newItem.category, img: newItem.img, inStock: 10 });
     }
     setShowModal(false);
   };
 
-  const deleteItem = (id: number) => {
+  const handleDeleteItem = (id: number) => {
     if (confirm("Estas seguro de eliminar este plato?")) {
-      setMenu(menu.filter(m => m.id !== id));
+      deleteMenuItem(id);
     }
   };
 
@@ -391,7 +399,7 @@ function MenuView() {
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-        {menu.map(item => (
+        {menuItems.map(item => (
           <div key={item.id} className="bg-[#121214] border border-stone-800 rounded flex overflow-hidden">
             <div className="w-32 relative">
               <Image src={item.img} alt={item.name} fill className="object-cover" />
@@ -407,7 +415,7 @@ function MenuView() {
                 <button onClick={() => openEdit(item)} className="p-2 border border-stone-700 hover:border-[#C6A96B] hover:text-[#C6A96B] rounded transition-colors text-stone-400">
                   <Edit className="w-4 h-4" />
                 </button>
-                <button onClick={() => deleteItem(item.id)} className="p-2 border border-stone-700 hover:border-red-500 hover:text-red-500 rounded transition-colors text-stone-400">
+                <button onClick={() => handleDeleteItem(item.id)} className="p-2 border border-stone-700 hover:border-red-500 hover:text-red-500 rounded transition-colors text-stone-400">
                   <Trash className="w-4 h-4" />
                 </button>
               </div>

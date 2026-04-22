@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import { OrderProvider } from "@/context/OrderContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,8 +19,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Le Bon Goût - Exclusive Restaurant",
-  description: "Experience culinary excellence at Le Bon Goût",
+  title: "Le Bon Gout - Exclusive Restaurant",
+  description: "Experience culinary excellence at Le Bon Gout",
 };
 
 export default function RootLayout({
@@ -29,10 +30,14 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="es"
       className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <OrderProvider>
+          {children}
+        </OrderProvider>
+      </body>
     </html>
   );
 }
