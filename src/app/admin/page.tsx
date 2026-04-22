@@ -164,7 +164,7 @@ function DashboardView() {
       <div className="grid grid-cols-3 gap-6">
         <div className="bg-[#121214] p-6 border border-stone-800 rounded">
           <h3 className="text-sm uppercase tracking-widest text-stone-400 mb-2">Ventas del Dia</h3>
-          <p className="text-3xl font-serif text-[#C6A96B]">$4,520</p>
+          <p className="text-3xl font-serif text-[#C6A96B]">S/ 4,520</p>
         </div>
         <div className="bg-[#121214] p-6 border border-stone-800 rounded">
           <h3 className="text-sm uppercase tracking-widest text-stone-400 mb-2">Ordenes Completadas</h3>
@@ -172,7 +172,7 @@ function DashboardView() {
         </div>
         <div className="bg-[#121214] p-6 border border-stone-800 rounded">
           <h3 className="text-sm uppercase tracking-widest text-stone-400 mb-2">Ticket Promedio</h3>
-          <p className="text-3xl font-serif text-white">$94.16</p>
+          <p className="text-3xl font-serif text-white">S/ 94.16</p>
         </div>
       </div>
 
@@ -200,7 +200,7 @@ function DashboardView() {
                 <div className="flex-1">
                   <div className="flex justify-between text-sm mb-1">
                     <span>{item}</span>
-                    <span className="text-stone-400">{85 - i * 15} uds</span>
+                    <span className="text-stone-400">{85 - i * 15} PEN</span>
                   </div>
                   <div className="h-2 bg-stone-800 rounded-full overflow-hidden">
                     <div className="h-full bg-[#C6A96B] rounded-full" style={{ width: `${85 - i * 15}%` }} />
@@ -218,7 +218,7 @@ function DashboardView() {
 // --- INVENTORY ---
 function InventoryView() {
   const { inventory } = useOrders();
-  
+
   return (
     <div className="bg-[#121214] border border-stone-800 rounded overflow-hidden">
       <table className="w-full text-left">

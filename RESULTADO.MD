@@ -1,113 +1,59 @@
-# RESULTADO: INFORME DE PROYECTO FINAL - LE BON GOÛT ERP
+# Análisis de Procesos Empresariales - Le Bon Goût
 
-## 1. RESUMEN
-El presente proyecto consiste en el desarrollo del sistema ERP y plataforma web "Le Bon Goût" para la gestión integral de un restaurante de lujo. El sistema permite administrar reservas, toma de pedidos por parte de meseros, visualización de comandas en cocina (KDS), facturación electrónica, y un panel de administración completo para inventario y métricas BI. El Frontend se desarrolló utilizando React/Next.js y el backend con Spring Boot/Java y Node.js, desplegado mediante una arquitectura de microservicios.
+Este documento detalla los principales procesos del sistema de gestión de restaurante "Le Bon Goût", desglosados por áreas empresariales clave según el análisis del código fuente y las vistas implementadas.
 
----
+## a. Marketing y Ventas
+El sistema integra procesos críticos para la captación y fidelización de clientes, así como la gestión del ciclo de venta directa.
 
-## 2. PLANIFICACIÓN Y FRONT-END
+*   **Gestión del Catálogo Gastronómico (Editor de Carta):** Permite la creación, edición y categorización de platillos, ajustando precios y descripciones para maximizar el atractivo comercial.
+*   **Sistema de Reservas Omnicanal:** Gestión de reservaciones a través de un calendario interactivo que permite visualizar la disponibilidad y asegurar la afluencia de clientes.
+*   **Punto de Venta Móvil (Interfaz de Mesero):** Proceso de toma de pedidos optimizado que permite a los meseros enviar comandas directamente a cocina, mejorando el tiempo de respuesta y la precisión del pedido.
+*   **Análisis de Preferencias del Consumidor (Top Products):** Identificación de los platillos más vendidos para orientar campañas de marketing y ajustes en la oferta gastronómica.
 
-### 2.1. ANÁLISIS EMPRESARIAL
+## b. Logística y Almacén
+Garantiza que el flujo de insumos sea eficiente y que el inventario se mantenga en niveles óptimos.
 
-#### 2.1.1. Análisis de Sistemas
-**Sistemas actuales identificados:**
-- **Caja registradora:** Toast POS (versión antigua 2018), sin actualizaciones.
-- **Reservas:** Resy (sin integración con POS ni inventario).
-- **Inventario, Costos y Nómina:** Excel manual.
-- **Facturación:** Toast sin facturación electrónica (generando riesgos con SUNAT).
-- **CRM:** Inexistente (solo libreta física).
-- **Compras:** WhatsApp, correo y Excel.
-**Principales problemas:** Falta de integración, pérdidas diarias de S/ 1,800 a S/ 4,500, gerente pierde 4-5 horas al día conciliando, riesgo con SUNAT y nulo análisis de rentabilidad por plato.
+*   **Control de Inventario en Tiempo Real:** Seguimiento automatizado del stock disponible para cada producto, con visibilidad inmediata del estado de existencias.
+*   **Gestión de Stock Crítico:** Sistema de alertas visuales que notifica a los administradores cuando un insumo cae por debajo del umbral de seguridad, facilitando la reposición oportuna.
+*   **Administración de Proveedores:** Directorio centralizado de suministradores con herramientas para la carga de facturas (XML/PDF) y seguimiento de órdenes de compra.
+*   **Sincronización Automática de Existencias:** El sistema descuenta automáticamente las unidades del inventario conforme se confirman las ventas en el salón.
 
-#### 2.1.2. Análisis de Procesos AS-IS
-- **Recepción y reservas:** Asignación manual de mesas, sin identificar clientes VIP.
-- **Pedidos y cocina:** Uso de papel, sin control de tiempos, 30% de errores en modificaciones.
-- **Caja & Cierre:** Digitación manual con altos errores, propinas mal gestionadas, reportes tardíos y manuales.
-- **Inventario:** Conteo manual lento (8-10h), sin stock mínimo ni histórico de compras.
-- **Cuellos de botella:** Fuerte dependencia de personas clave y pérdida constante de información.
+## c. Producción y Operaciones
+Se enfoca en la eficiencia dentro de la cocina y la calidad del servicio entregado al cliente.
 
-#### 2.1.3. Arquitectura Empresarial
-- **Módulos propuestos:** Facturación electrónica, Reservas, Inventario, Compras, Mapa de mesas, Control de mermas, BI (ventas, costos, rentabilidad).
-- **Tecnología base:** Backend en Node.js, Frontend en React, BD MySQL.
-- **Beneficios esperados:** Reducción del 65% en mermas (S/ 420k de ahorro), -95% en errores de caja, aumento del 10% en clientes VIP, y optimización del Food cost (de 38% a 30%).
+*   **Sistema de Visualización de Cocina (KDS):** Digitalización de las comandas para que los chefs visualicen pedidos en tiempo real, priorizando por hora de llegada.
+*   **Seguimiento de Preparación:** Control paso a paso de cada ítem de la comanda, permitiendo marcar platos listos y notificar el servicio de mesa.
+*   **Control de Mermas y Desperdicios:** Registro detallado de productos perdidos por mal estado, caídas o errores de emplatado, permitiendo una conciliación de inventario más precisa.
+*   **Monitoreo de Productividad:** Seguimiento del volumen de pedidos por mesero y tiempos promedio de preparación por cocinero para optimizar turnos y procesos.
 
-#### 2.1.4. Innovación Tecnológica
-- IA predictiva de demanda (94% de precisión).
-- NFT Membership VIP.
+## d. Dirección o Gerencia General
+Proporciona las herramientas necesarias para la toma de decisiones estratégicas basadas en datos.
 
----
+*   **Dashboard de Métricas Clave (KPIs):** Visualización centralizada de ventas diarias, ticket promedio y volumen de órdenes completadas.
+*   **Análisis de Tendencias Financieras:** Gráficos de ventas semanales que permiten identificar picos de demanda y estacionalidad.
+*   **Gestión de Estructura Organizacional:** Control total sobre el personal, asignación de roles y permisos de acceso al sistema.
 
-### 2.2. PLANIFICACIÓN DE PROYECTOS
+## e. Finanzas y Contabilidad
+Este departamento se encarga de la salud financiera del restaurante, utilizando los datos transaccionales generados por el ERP.
 
-#### 2.2.1. Gestión de Requerimientos
-- **Funcionales:** Reservas, CRM, Mapa en tiempo real, Pedidos en tablet, KDS, POS electrónico, Inventario en tiempo real, Dashboard, App empleados.
-- **No Funcionales:** 99.98% de disponibilidad, tiempos de respuesta <800ms, cifrado de seguridad AES-256, soporte para 180 clientes simultáneos.
+*   **Gestión de Cuentas por Pagar:** Seguimiento de las obligaciones con proveedores a partir de la carga de facturas en el módulo logístico.
+*   **Control de Ingresos y Tesorería:** Monitoreo diario del flujo de caja basado en las órdenes completadas y el ticket promedio reportado en el dashboard.
+*   **Auditoría de Costos y Rentabilidad:** Cruce de información entre las mermas registradas y el inventario consumido para calcular el costo real de ventas y márgenes de utilidad por platillo.
 
-#### 2.2.2. Calendarización
-(Mapeado a través de los Sprints definidos en Scrum, estructurando el proyecto en un lapso de 20 semanas).
+## f. Servicio al Cliente y Fidelización
+Procesos orientados a maximizar la satisfacción del comensal y asegurar su retorno.
 
-#### 2.2.3. Desarrollo Ágil SCRUM
-- **Duración y Sprints:** Proyecto de 20 semanas en Sprints de 2 semanas. (Sprint 0: análisis/diseño, Sprints 1-2: reservas/CRM, Sprints 3-5: POS/pedidos, Sprints 6-7: inventario, Sprint 8: facturación, Sprint 9: dashboard, Sprint 10: testing).
-- **Artefactos:** Product Backlog, Sprint Backlog e Incrementos.
-- **Eventos:** Daily a las 9:15 am, Planning los lunes, Review y Retro los viernes.
+*   **Gestión de la Experiencia Personalizada:** Uso de las notas especiales en las reservas y comandas para atender requerimientos específicos (alergias, celebraciones, preferencias de cocción).
+*   **Base de Datos de Clientes (CRM):** Centralización de la información de contacto recolectada en el flujo de reservas para futuras campañas de fidelización y marketing directo.
 
----
+## g. Tecnología de la Información (TI)
+Garantiza la operatividad, seguridad y evolución continua de la plataforma digital.
 
-### 2.3. DESARROLLO DE SOFTWARE
+*   **Administración de Infraestructura Cloud:** Gestión del despliegue y disponibilidad del sistema para asegurar que las interfaces de cocina y meseros operen sin interrupciones.
+*   **Seguridad de la Información y Ciberseguridad:** Implementación de protocolos de cifrado para las credenciales del personal y protección de los datos sensibles de los clientes.
+*   **Mantenimiento y Escalabilidad de Software:** Actualización constante de la carta digital y optimización de las funciones del KDS basadas en el feedback operativo.
 
-- **Infraestructura:** Arquitectura de Microservicios, API Gateway y protocolo REST HTTPS.
-- **Plataforma:** Vercel (Frontend) y Railway (Backend + BD).
-- **Herramientas:** Git + GitHub, Docker, CI/CD, Jira.
-- **Tecnologías:** Next.js, Spring Boot, TypeScript, Java.
+## h. Otros Procesos Transversales
+*   **Gestión de Capital Humano:** Reclutamiento, asignación de roles y seguimiento del desempeño de meseros y cocineros mediante métricas de eficiencia (órdenes/tiempo).
+*   **Seguridad y Salud en el Trabajo:** Registro de incidentes que derivan en mermas (ej. caídas de platos) para identificar riesgos operativos en el salón o cocina.
 
----
-
-### 2.4. PROTOTIPOS
-
-Se emplearon **Wireframes** y **Mockups** para definir la interfaz, aplicando principios avanzados de **UX/UI** y un diseño intuitivo orientado al lujo.
-
----
-
-### 2.5. RIESGOS
-
-Se contemplan estrategias de mitigación para riesgos en **Desarrollo**, **Despliegue** y **Monitoreo**, asegurando la estabilidad del sistema en cada pase a producción.
-
----
-
-### 2.6. FRONT-END
-
-Implementación basada en **Buenas prácticas** de React/Next.js y conversión fiel de los **Prototipos** web en componentes interactivos y responsivos.
-
----
-
-### 2.7. SLA
-
-Definición de **Buenas prácticas** y acuerdos de niveles de servicio (SLA) para garantizar la operatividad de los módulos críticos como el KDS y el POS.
-
----
-
-### 2.8. OPTIMIZACIÓN WEB
-
-Aplicación de **WPO (Web Performance Optimization)** para asegurar la carga rápida de las vistas, crucial para la atención fluida en el restaurante.
-
----
-
-## 3. DOCUMENTACIÓN
-
-### 3.1. Scrum Team
-Equipo de desarrollo alineado con las ceremonias ágiles.
-
-### 3.2. Sprints
-Seguimiento y cierre de iteraciones según lo planificado en las 20 semanas.
-
-### 3.3. Monday
-Uso de tableros de gestión visual para seguimiento de tareas a nivel gerencial.
-
-### 3.4. GitHub
-- **Commits:** Historial de versionamiento y despliegues.
-- **Issues:** Gestión de tickets para resolución de bugs.
-
-### 3.5. Pruebas
-- **Unitarias e Integrales:** Validación del código en Frontend y Backend.
-- **Usabilidad:** Pruebas de campo con los prototipos y producto final.
-- **Seguridad:** Verificación de vulnerabilidades y encriptación de datos.
