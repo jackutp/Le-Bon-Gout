@@ -109,12 +109,12 @@ export default function Home() {
               {
                 name: "Ravioli de Langosta",
                 desc: "Pasta casera, crema de azafrán, caviar",
-                img: "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&q=80&w=800"
+                img: "https://images.unsplash.com/photo-1632389762435-8c53185e40ae?q=80&w=1529&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               },
               {
                 name: "Mousse de Chocolate Oscuro",
                 desc: "Lámina de oro, coulis de frambuesa, crujiente de avellana",
-                img: "https://images.unsplash.com/photo-1574966739987-65e38f2cea46?auto=format&fit=crop&q=80&w=800"
+                img: "https://images.unsplash.com/photo-1621792888014-baa25efa7c7e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               }
             ].map((dish, i) => (
               <motion.div
@@ -142,7 +142,7 @@ export default function Home() {
 
           <div className="text-center mt-16">
             <button className="border border-amber-500 text-amber-500 px-8 py-3 uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-colors">
-              View Full Menu
+              Ver Menú Completo
             </button>
           </div>
         </div>

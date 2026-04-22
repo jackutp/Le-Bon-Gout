@@ -10,9 +10,9 @@ import Link from "next/link";
 const PRODUCTS = [
   { id: 1, name: "Filet Mignon", desc: "Puré con trufa, espárragos", price: 45, stock: 12, img: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800" },
   { id: 2, name: "Ravioli de Langosta", desc: "Crema de azafrán, caviar", price: 38, stock: 5, img: "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&q=80&w=800" },
-  { id: 3, name: "Mousse de Chocolate", desc: "Lámina de oro, frambuesa", price: 18, stock: 0, img: "https://images.unsplash.com/photo-1574966739987-65e38f2cea46?auto=format&fit=crop&q=80&w=800" },
+  { id: 3, name: "Mousse de Chocolate", desc: "Lámina de oro, frambuesa", price: 18, stock: 0, img: "https://images.unsplash.com/photo-1621792888014-baa25efa7c7e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
   { id: 4, name: "Chablis Grand Cru", desc: "Vino blanco, 2019", price: 120, stock: 3, img: "https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&q=80&w=800" },
-  { id: 5, name: "Caviar Beluga", desc: "Con blinis y crema", price: 150, stock: 2, img: "https://images.unsplash.com/photo-1628190710609-0d25bf33c0bd?auto=format&fit=crop&q=80&w=800" },
+  { id: 5, name: "Caviar Beluga", desc: "Con blinis y crema", price: 150, stock: 2, img: "https://images.unsplash.com/photo-1728335026927-8ee0382ada94?q=80&w=627&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
   { id: 6, name: "Magret de Pato", desc: "Salsa de frutos rojos", price: 42, stock: 8, img: "https://images.unsplash.com/photo-1615937657715-bc7b4b7962c1?auto=format&fit=crop&q=80&w=800" },
 ];
 
@@ -60,9 +60,9 @@ export default function MeseroPage() {
     setShowModal(false);
   };
 
-return (
+  return (
     <div className="bg-[#0B0B0C] min-h-screen text-stone-100 flex flex-col lg:flex-row font-sans">
-      
+
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Header */}
@@ -74,7 +74,7 @@ return (
           <div className="flex items-center gap-4 w-full sm:w-auto">
             <div className="flex items-center gap-2 flex-1 sm:flex-none">
               <label className="text-sm uppercase tracking-widest text-stone-400">Mesa:</label>
-              <select 
+              <select
                 value={selectedTable}
                 onChange={(e) => setSelectedTable(e.target.value)}
                 className="bg-[#0B0B0C] border border-stone-800 text-white px-3 py-2 focus:outline-none focus:border-[#C6A96B] flex-1 sm:flex-none"
@@ -96,7 +96,7 @@ return (
           <h2 className="text-amber-500 tracking-[0.2em] uppercase text-sm mb-4 lg:mb-6">Catalogo de Productos</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
             {PRODUCTS.map((product) => (
-              <motion.div 
+              <motion.div
                 key={product.id}
                 whileHover={{ scale: 1.02 }}
                 className={`bg-[#121214] border ${product.stock === 0 ? 'border-red-900/50 opacity-70' : 'border-stone-800'} rounded-lg overflow-hidden flex flex-col`}
@@ -116,7 +116,7 @@ return (
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-medium text-[#C6A96B]">${product.price}</span>
-                    <button 
+                    <button
                       onClick={() => addToOrder(product.id)}
                       disabled={product.stock === 0}
                       className="bg-stone-800 hover:bg-[#C6A96B] hover:text-black disabled:opacity-50 disabled:hover:bg-stone-800 disabled:hover:text-white text-white p-2 rounded transition-colors"
@@ -139,7 +139,7 @@ return (
             Mesa {selectedTable}
           </h2>
         </div>
-        
+
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {orderItems.length === 0 ? (
             <div className="h-full flex items-center justify-center text-stone-500 text-sm italic text-center">
@@ -148,7 +148,7 @@ return (
           ) : (
             <AnimatePresence>
               {orderItems.map((item) => (
-                <motion.div 
+                <motion.div
                   key={item.id}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -164,8 +164,8 @@ return (
                       <Minus className="w-4 h-4" />
                     </button>
                     <span className="w-4 text-center text-sm">{item.qty}</span>
-                    <button 
-                      onClick={() => addToOrder(item.id)} 
+                    <button
+                      onClick={() => addToOrder(item.id)}
                       disabled={item.qty >= item.stock}
                       className="p-1 bg-stone-800 hover:bg-stone-700 disabled:opacity-50 rounded text-stone-300"
                     >
@@ -183,7 +183,7 @@ return (
             <span className="text-stone-400 uppercase tracking-widest text-sm">Total</span>
             <span className="text-2xl font-serif text-[#C6A96B]">${total}</span>
           </div>
-          <button 
+          <button
             onClick={() => setShowModal(true)}
             disabled={order.length === 0}
             className="w-full bg-[#C6A96B] hover:bg-white text-black font-medium uppercase tracking-widest text-sm py-4 transition-colors disabled:opacity-50 disabled:hover:bg-[#C6A96B] flex justify-center items-center gap-2"
@@ -203,7 +203,7 @@ return (
             <p className="text-lg font-serif text-[#C6A96B]">${total}</p>
           </div>
         </div>
-        <button 
+        <button
           onClick={() => setShowModal(true)}
           disabled={order.length === 0}
           className="bg-[#C6A96B] hover:bg-white text-black font-medium uppercase tracking-widest text-sm px-6 py-3 transition-colors disabled:opacity-50 disabled:hover:bg-[#C6A96B] flex items-center gap-2"
@@ -216,29 +216,29 @@ return (
       <AnimatePresence>
         {showModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/80 backdrop-blur-sm"
               onClick={() => setShowModal(false)}
             />
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               className="relative bg-[#121214] border border-stone-800 shadow-2xl p-8 max-w-md w-full"
             >
-              <button 
+              <button
                 onClick={() => setShowModal(false)}
                 className="absolute top-4 right-4 text-stone-500 hover:text-white"
               >
                 <X className="w-5 h-5" />
               </button>
-              
+
               <h2 className="text-2xl font-serif text-[#C6A96B] mb-2">Resumen de Orden</h2>
               <p className="text-stone-400 text-sm mb-6 uppercase tracking-widest">Mesa {selectedTable}</p>
-              
+
               <div className="space-y-3 mb-6 max-h-60 overflow-y-auto pr-2">
                 {orderItems.map((item) => (
                   <div key={item.id} className="flex justify-between text-sm">
@@ -247,20 +247,20 @@ return (
                   </div>
                 ))}
               </div>
-              
+
               <div className="border-t border-stone-800 pt-4 flex justify-between items-center mb-8">
                 <span className="font-serif text-lg">Total Final</span>
                 <span className="font-serif text-xl text-[#C6A96B]">$\${total}</span>
               </div>
-              
+
               <div className="flex gap-4">
-                <button 
+                <button
                   onClick={() => setShowModal(false)}
                   className="flex-1 border border-stone-800 text-stone-400 uppercase tracking-widest text-xs py-3 hover:text-white transition-colors"
                 >
                   Cancelar
                 </button>
-                <button 
+                <button
                   onClick={handleConfirm}
                   className="flex-1 bg-[#C6A96B] text-black uppercase tracking-widest text-xs py-3 hover:bg-white transition-colors"
                 >

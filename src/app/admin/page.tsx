@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  LogOut, LayoutDashboard, Package, Users, BookOpen, 
+import {
+  LogOut, LayoutDashboard, Package, Users, BookOpen,
   Calendar, Truck, AlertTriangle, Plus, Edit, Trash, CheckCircle, X
 } from "lucide-react";
 import Link from "next/link";
@@ -82,9 +82,8 @@ export default function AdminPage() {
             <button
               key={item.id}
               onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-3 py-2 lg:py-3 rounded text-sm uppercase tracking-widest transition-colors ${
-                activeTab === item.id ? "bg-[#C6A96B]/10 text-[#C6A96B] border border-[#C6A96B]/30" : "text-stone-400 hover:text-white hover:bg-stone-900"
-              }`}
+              className={`w-full flex items-center gap-3 px-3 py-2 lg:py-3 rounded text-sm uppercase tracking-widest transition-colors ${activeTab === item.id ? "bg-[#C6A96B]/10 text-[#C6A96B] border border-[#C6A96B]/30" : "text-stone-400 hover:text-white hover:bg-stone-900"
+                }`}
             >
               <item.icon className="w-4 h-4" />
               <span className="text-xs">{item.label}</span>
@@ -122,9 +121,8 @@ export default function AdminPage() {
                 <button
                   key={item.id}
                   onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded text-sm uppercase tracking-widest transition-colors ${
-                    activeTab === item.id ? "bg-[#C6A96B]/10 text-[#C6A96B] border border-[#C6A96B]/30" : "text-stone-400 hover:text-white hover:bg-stone-900"
-                  }`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded text-sm uppercase tracking-widest transition-colors ${activeTab === item.id ? "bg-[#C6A96B]/10 text-[#C6A96B] border border-[#C6A96B]/30" : "text-stone-400 hover:text-white hover:bg-stone-900"
+                    }`}
                 >
                   <item.icon className="w-4 h-4" />
                   {item.label}
@@ -195,7 +193,7 @@ function DashboardView() {
             ))}
           </div>
         </div>
-        
+
         <div className="bg-[#121214] border border-stone-800 rounded p-6">
           <h3 className="text-sm uppercase tracking-widest text-stone-400 mb-6">Productos Top</h3>
           <div className="space-y-4">
@@ -287,25 +285,25 @@ function StaffView() {
         <form onSubmit={addStaff} className="space-y-4">
           <div>
             <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Nombre</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={newStaff.name}
               onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })}
-              className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2 focus:border-[#C6A96B]" 
+              className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2 focus:border-[#C6A96B]"
             />
           </div>
           <div>
             <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Email</label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               value={newStaff.email}
               onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
-              className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2 focus:border-[#C6A96B]" 
+              className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2 focus:border-[#C6A96B]"
             />
           </div>
           <div>
             <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Rol</label>
-            <select 
+            <select
               value={newStaff.role}
               onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value as "Mesero" | "Cocinero" })}
               className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2 focus:border-[#C6A96B]"
@@ -364,7 +362,7 @@ function MenuView() {
 
   const openEdit = (item: MenuItem) => { setEditingItem(item); setNewItem({ name: item.name, price: item.price.toString(), desc: item.desc, category: item.category, img: item.img }); setShowModal(true); };
   const openAdd = () => { setEditingItem(null); setNewItem({ name: "", price: "", desc: "", category: "Plato", img: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800" }); setShowModal(true); };
-  
+
   const saveItem = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newItem.name || !newItem.price) return;
@@ -388,7 +386,7 @@ function MenuView() {
         <p className="text-stone-400 text-sm">Gestiona los platillos visibles en el catalogo de meseros.</p>
         <button onClick={openAdd} className="flex items-center gap-2 bg-[#C6A96B] text-black px-4 py-2 rounded text-sm uppercase tracking-widest hover:bg-white transition-colors">
           <Plus className="w-4 h-4" />
-          Nuevo Platillo
+          Nuevo
         </button>
       </div>
 
