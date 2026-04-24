@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LogOut, LayoutDashboard, Package, Users, BookOpen,
-  Calendar, Truck, AlertTriangle, Plus, Edit, Trash, CheckCircle, X
+  Calendar, Truck, AlertTriangle, Plus, Edit, Trash, CheckCircle, X, Send, Save, Edit3
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -23,15 +23,20 @@ const INITIAL_STAFF: Staff[] = [
   { id: 4, name: "Carlos Ruiz", email: "carlos@lebongout.com", role: "Cocinero", password: "", notes: "", avgTime: "16m" },
 ];
 
-
-
 const INITIAL_WASTE: Waste[] = [
-  { id: 1, item: "Mousse de Chocolate", qty: "1 porción", reason: "Se cayó al emplatar", date: "Hoy, 19:15" },
+  { id: 1, item: "Mousse de Chocolate", qty: "1 porciÃ³n", reason: "Se cayÃ³ al emplatar", date: "Hoy, 19:15" },
 ];
 
 const RESERVATIONS: Reservation[] = [
-  { id: 1, name: "Familia Vigneau", details: "Mesa 4 • 20:00 hrs • 4 pax", date: "14/Oct" },
-  { id: 2, name: "Empresa Moderna", details: "Mesa 8 • 19:30 hrs • 8 pax", date: "14/Oct" },
+  { id: 1, name: "Familia Vigneau", details: "Mesa 4 â€¢ 20:00 hrs â€¢ 4 pax", date: "14/Oct" },
+  { id: 2, name: "Empresa Moderna", details: "Mesa 8 â€¢ 19:30 hrs â€¢ 8 pax", date: "14/Oct" },
+];
+
+const SUPPLIERS_LIST = [
+  { id: 1, name: "Maison de la Truffe", contact: "contact@maisontruffe.com", specialty: "Trufas y Productos Premium" },
+  { id: 2, name: "Pesca Directa", contact: "operaciones@pescadirecta.com", specialty: "Mariscos Frescos" },
+  { id: 3, name: "Vinos del Valle", contact: "ventas@vinosdelvalle.com", specialty: "Vinos y Licores" },
+  { id: 4, name: "Carniceria Selecta", contact: "pedidos@carnselecta.com", quality: "Carnes Premium" },
 ];
 
 export default function AdminPage() {
@@ -215,41 +220,251 @@ function DashboardView() {
   );
 }
 
-// --- INVENTORY ---
+// --- INVENTORY (REESTRUCTURADO: Dos Contenedores Independientes) ---
 function InventoryView() {
-  const { inventory } = useOrders();
+  const { inventory, menuItems, updateMenuItem } = useOrders();
+  const [editingStock, setEditingStock] = useState<{ id: number; field: string } | null>(null);
+  const [tempValue, setTempValue] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<MenuItem | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+
+  const handleQuickEdit = (id: number, field: string, currentValue: number) => {
+    setEditingStock({ id, field });
+    setTempValue(currentValue.toString());
+  };
+
+  const saveQuickEdit = (itemId: number) => {
+    const newStock = parseInt(tempValue);
+    if (!isNaN(newStock) && newStock >= 0) {
+      const updatedItem = inventory.find(i => i.id === itemId);
+      if (updatedItem) {
+        const { updateInventoryStock } = require("@/context/OrderContext").useOrders?.() || { syncStockChange: () => {} };
+      }
+    }
+    setEditingStock(null);
+  };
+
+  const openEditProduct = (item: MenuItem) => {
+    setEditingProduct(item);
+    setShowEditModal(true);
+  };
+
+  const saveProduct = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingProduct) {
+      updateMenuItem(editingProduct.id, editingProduct);
+      setShowEditModal(false);
+      setEditingProduct(null);
+    }
+  };
+
+  const filteredMenu = categoryFilter === "all" ? menuItems : menuItems.filter(item => item.category === categoryFilter);
 
   return (
-    <div className="bg-[#121214] border border-stone-800 rounded overflow-hidden">
-      <table className="w-full text-left">
-        <thead className="bg-black/40 border-b border-stone-800 text-xs uppercase tracking-widest text-stone-400">
-          <tr>
-            <th className="p-4">Producto</th>
-            <th className="p-4">Unidad</th>
-            <th className="p-4">Stock</th>
-            <th className="p-4 text-right">Estado</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-stone-800 text-sm">
-          {inventory.map((item) => (
-            <tr key={item.id} className={item.stock < 10 ? "bg-red-900/10" : ""}>
-              <td className="p-4">{item.name}</td>
-              <td className="p-4 text-stone-400">{item.unit}</td>
-              <td className="p-4 font-mono">{item.stock}</td>
-              <td className="p-4 text-right">
-                {item.stock < 10 ? (
-                  <span className="inline-flex items-center gap-2 text-red-500 px-3 py-1 border border-red-500/30 rounded-full text-xs">
-                    <AlertTriangle className="w-3 h-3" />
-                    Stock Critico
-                  </span>
-                ) : (
-                  <span className="text-stone-500">Normal</span>
-                )}
-              </td>
+    <div className="space-y-6">
+      {/* CONTENEDOR 1: INSUMOS */}
+      <div className="bg-[#121214] border border-stone-800 rounded overflow-hidden">
+        <div className="p-4 border-b border-stone-800 bg-black/20">
+          <h2 className="text-lg font-serif text-[#C6A96B]">Cuadro de Insumos</h2>
+        </div>
+        <table className="w-full text-left">
+          <thead className="bg-black/40 border-b border-stone-800 text-xs uppercase tracking-widest text-stone-400">
+            <tr>
+              <th className="p-4">Producto</th>
+              <th className="p-4">Unidad</th>
+              <th className="p-4">Stock</th>
+              <th className="p-4">Estado</th>
+              <th className="p-4 text-right">Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-stone-800 text-sm">
+            {inventory.map((item) => (
+              <tr key={item.id} className={item.stock < 10 ? "bg-red-900/10" : ""}>
+                <td className="p-4">{item.name}</td>
+                <td className="p-4 text-stone-400">{item.unit}</td>
+                <td className="p-4">
+                  {editingStock?.id === item.id ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={tempValue}
+                        onChange={(e) => setTempValue(e.target.value)}
+                        className="w-20 bg-[#0B0B0C] border border-[#C6A96B] text-white px-2 py-1"
+                        autoFocus
+                      />
+                      <button onClick={() => saveQuickEdit(item.id)} className="p-1 text-green-500 hover:text-green-400">
+                        <Save className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="font-mono">{item.stock}</span>
+                  )}
+                </td>
+                <td className="p-4 text-right">
+                  {item.stock < 10 ? (
+                    <span className="inline-flex items-center gap-2 text-red-500 px-3 py-1 border border-red-500/30 rounded-full text-xs">
+                      <AlertTriangle className="w-3 h-3" />
+                      Stock CrÃ­tico
+                    </span>
+                  ) : (
+                    <span className="text-stone-500">Normal</span>
+                  )}
+                </td>
+                <td className="p-4 text-right">
+                  <button
+                    onClick={() => handleQuickEdit(item.id, "stock", item.stock)}
+                    className="inline-flex items-center gap-1 px-3 py-1 border border-stone-700 hover:border-[#C6A96B] text-stone-400 hover:text-[#C6A96B] rounded transition-colors"
+                  >
+                    <Edit3 className="w-3 h-3" />
+                    Modificar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* CONTENEDOR 2: PRODUCTOS */}
+      <div className="bg-[#121214] border border-stone-800 rounded overflow-hidden">
+        <div className="p-4 border-b border-stone-800 bg-black/20 flex flex-wrap gap-4 justify-between items-center">
+          <h2 className="text-lg font-serif text-[#C6A96B]">Cuadro de Productos</h2>
+          <div className="flex gap-2">
+            {["all", "Plato", "Bebida", "Postre"].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setCategoryFilter(cat)}
+                className={`px-3 py-1 rounded text-xs uppercase tracking-widest transition-colors ${categoryFilter === cat ? "bg-[#C6A96B] text-black" : "border border-stone-700 text-stone-400 hover:text-white"}`}
+              >
+                {cat === "all" ? "Todos" : cat === "Plato" ? "Platillos" : cat === "Bebida" ? "Bebidas" : cat}
+              </button>
+            ))}
+          </div>
+        </div>
+        <table className="w-full text-left">
+          <thead className="bg-black/40 border-b border-stone-800 text-xs uppercase tracking-widest text-stone-400">
+            <tr>
+              <th className="p-4">Nombre</th>
+              <th className="p-4">CategorÃ­a</th>
+              <th className="p-4">Precio</th>
+              <th className="p-4">Stock</th>
+              <th className="p-4 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-stone-800 text-sm">
+            {filteredMenu.map((item) => (
+              <tr key={item.id}>
+                <td className="p-4 font-medium">{item.name}</td>
+                <td className="p-4 text-stone-400">{item.category}</td>
+                <td className="p-4 text-[#C6A96B]">S/ {item.price.toFixed(2)}</td>
+                <td className="p-4">
+                  {editingStock?.id === item.id ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={tempValue}
+                        onChange={(e) => setTempValue(e.target.value)}
+                        className="w-20 bg-[#0B0B0C] border border-[#C6A96B] text-white px-2 py-1"
+                        autoFocus
+                      />
+                      <button onClick={() => saveQuickEdit(item.id)} className="p-1 text-green-500 hover:text-green-400">
+                        <Save className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="font-mono">{item.inStock}</span>
+                  )}
+                </td>
+                <td className="p-4 text-right">
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => handleQuickEdit(item.id, "inStock", item.inStock)}
+                      className="p-2 border border-stone-700 hover:border-[#C6A96B] text-stone-400 hover:text-[#C6A96B] rounded transition-colors"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => openEditProduct(item)}
+                      className="px-3 py-1 border border-stone-700 hover:border-[#C6A96B] text-stone-400 hover:text-[#C6A96B] rounded transition-colors text-xs uppercase"
+                    >
+                      Editar producto
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* MODAL EDITAR PRODUCTO */}
+      <AnimatePresence>
+        {showEditModal && editingProduct && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowEditModal(false)} />
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative bg-[#121214] border border-stone-800 shadow-2xl p-8 max-w-lg w-full">
+              <button onClick={() => setShowEditModal(false)} className="absolute top-4 right-4 text-stone-500 hover:text-white"><X className="w-5 h-5" /></button>
+              <h2 className="text-2xl font-serif text-[#C6A96B] mb-6">Editar Producto</h2>
+              <form onSubmit={saveProduct} className="space-y-4">
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Nombre</label>
+                  <input 
+                    type="text" 
+                    value={editingProduct.name} 
+                    onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })} 
+                    className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2" 
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Precio</label>
+                    <input 
+                      type="number" 
+                      value={editingProduct.price} 
+                      onChange={(e) => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) })} 
+                      className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Stock</label>
+                    <input 
+                      type="number" 
+                      value={editingProduct.inStock} 
+                      onChange={(e) => setEditingProduct({ ...editingProduct, inStock: parseInt(e.target.value) })} 
+                      className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2" 
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">CategorÃ­a</label>
+                  <select 
+                    value={editingProduct.category} 
+                    onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value as "Plato" | "Bebida" | "Postre" })} 
+                    className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2"
+                  >
+                    <option>Plato</option>
+                    <option>Bebida</option>
+                    <option>Postre</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">DescripciÃ³n</label>
+                  <textarea 
+                    value={editingProduct.desc} 
+                    onChange={(e) => setEditingProduct({ ...editingProduct, desc: e.target.value })} 
+                    className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2 h-20 resize-none"
+                  />
+                </div>
+                <div className="flex gap-4 pt-4">
+                  <button type="button" onClick={() => setShowEditModal(false)} className="flex-1 border border-stone-800 text-stone-400 py-3 hover:text-white">Cancelar</button>
+                  <button type="submit" className="flex-1 bg-[#C6A96B] text-black py-3 hover:bg-white">Guardar</button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -293,7 +508,7 @@ function StaffView() {
             />
           </div>
           <div>
-            <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Contrasena</label>
+            <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">ContraseÃ±a</label>
             <input
               type="password"
               value={newStaff.password}
@@ -351,7 +566,7 @@ function StaffView() {
                 <p className="text-sm">{s.name}</p>
                 <p className="text-xs text-stone-500">Promedio: {s.avgTime}/plato</p>
               </div>
-              <span className="text-[#C6A96B] text-sm">Optimo</span>
+              <span className="text-[#C6A96B] text-sm">Ã“ptimo</span>
             </div>
           ))}
           {cocineros.length === 0 && <p className="text-stone-500 text-sm">No hay cocineros registrados</p>}
@@ -512,21 +727,51 @@ function ReservationsView() {
   );
 }
 
-// --- SUPPLIERS ---
+// --- SUPPLIERS (CON MODAL SOLICITUD) ---
 function SuppliersView() {
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [selectedSupplier, setSelectedSupplier] = useState("");
+  const [requestDescription, setRequestDescription] = useState("");
+  const [showSentFeedback, setShowSentFeedback] = useState(false);
+
+  const handleSendRequest = () => {
+    if (!selectedSupplier || !requestDescription) return;
+    setShowSentFeedback(true);
+    setTimeout(() => {
+      setShowSentFeedback(false);
+      setShowRequestModal(false);
+      setSelectedSupplier("");
+      setRequestDescription("");
+    }, 2000);
+  };
+
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <button 
+          onClick={() => setShowRequestModal(true)}
+          className="flex items-center gap-2 bg-[#C6A96B] text-black px-4 py-2 rounded text-sm uppercase tracking-widest hover:bg-white transition-colors"
+        >
+          <Send className="w-4 h-4" />
+          Solicitar Pedido
+        </button>
+      </div>
+
       <div className="grid grid-cols-3 gap-6">
         <div className="col-span-2 bg-[#121214] border border-stone-800 rounded p-6">
           <h2 className="text-xl font-serif text-white mb-6">Directorio de Proveedores</h2>
           <div className="space-y-4">
-            <div className="p-4 border border-stone-800 rounded flex justify-between items-center">
-              <div>
-                <p className="text-sm font-medium">Maison de la Truffe</p>
-                <p className="text-xs text-stone-500">Insumos Premium - Calidad: 9.8/10</p>
+            {SUPPLIERS_LIST.map(supplier => (
+              <div key={supplier.id} className="p-4 border border-stone-800 rounded flex justify-between items-center">
+                <div>
+                  <p className="text-sm font-medium">{supplier.name}</p>
+                  <p className="text-xs text-stone-500">{supplier.specialty || supplier.specialty}</p>
+                </div>
+                <button className="text-xs uppercase tracking-widest text-[#C6A96B] hover:text-white transition-colors">
+                  Ver POs
+                </button>
               </div>
-              <button className="text-xs uppercase tracking-widest text-[#C6A96B] hover:text-white transition-colors">Ver POs</button>
-            </div>
+            ))}
           </div>
         </div>
         <div className="bg-[#121214] border border-stone-800 rounded p-6 flex flex-col">
@@ -537,6 +782,81 @@ function SuppliersView() {
           </div>
         </div>
       </div>
+
+      {/* MODAL SOLICITAR PEDIDO */}
+      <AnimatePresence>
+        {showRequestModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowRequestModal(false)} />
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative bg-[#121214] border border-stone-800 shadow-2xl p-8 max-w-lg w-full">
+              <button onClick={() => setShowRequestModal(false)} className="absolute top-4 right-4 text-stone-500 hover:text-white"><X className="w-5 h-5" /></button>
+              <h2 className="text-2xl font-serif text-[#C6A96B] mb-6">Solicitar Pedido a Proveedor</h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Seleccionar Proveedor</label>
+                  <select 
+                    value={selectedSupplier} 
+                    onChange={(e) => setSelectedSupplier(e.target.value)}
+                    className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2"
+                  >
+                    <option value="">Seleccionar...</option>
+                    {SUPPLIERS_LIST.map(s => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Insumos Solicitados</label>
+                  <textarea
+                    value={requestDescription}
+                    onChange={(e) => setRequestDescription(e.target.value)}
+                    placeholder="Listar los insumos requeridos con cantidades..."
+                    className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2 h-32 resize-none"
+                  />
+                </div>
+
+                <div className="flex gap-4 pt-4">
+                  <button 
+                    type="button" 
+                    onClick={() => setShowRequestModal(false)} 
+                    className="flex-1 border border-stone-800 text-stone-400 py-3 hover:text-white"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={handleSendRequest}
+                    disabled={!selectedSupplier || !requestDescription}
+                    className="flex-1 bg-[#C6A96B] text-black py-3 hover:bg-white disabled:opacity-50 disabled:hover:bg-[#C6A96B] flex items-center justify-center gap-2"
+                  >
+                    <Send className="w-4 h-4" />
+                    Enviar
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* FEEDBACK VISUAL */}
+      <AnimatePresence>
+        {showSentFeedback && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }} 
+              animate={{ opacity: 1, scale: 1 }} 
+              exit={{ opacity: 0, scale: 0.8 }} 
+              className="bg-green-600/20 border border-green-500 text-green-500 px-8 py-4 rounded-lg flex items-center gap-3"
+            >
+              <CheckCircle className="w-6 h-6" />
+              <span className="text-lg">Pedido enviado correctamente</span>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -604,11 +924,11 @@ function WasteView() {
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Cantidad</label>
-                  <input type="text" value={newWaste.qty} onChange={(e) => setNewWaste({ ...newWaste, qty: e.target.value })} placeholder="1 porcion, 500g..." className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2" />
+                  <input type="text" value={newWaste.qty} onChange={(e) => setNewWaste({ ...newWaste, qty: e.target.value })} placeholder="1 porciÃ³n, 500g..." className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2" />
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Motivo</label>
-                  <input type="text" value={newWaste.reason} onChange={(e) => setNewWaste({ ...newWaste, reason: e.target.value })} placeholder="Se cayo, mal estado..." className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2" />
+                  <input type="text" value={newWaste.reason} onChange={(e) => setNewWaste({ ...newWaste, reason: e.target.value })} placeholder="Se cayÃ³, mal estado..." className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2" />
                 </div>
                 <div className="flex gap-4 pt-4">
                   <button type="button" onClick={() => setShowModal(false)} className="flex-1 border border-stone-800 text-stone-400 py-3 hover:text-white">Cancelar</button>
