@@ -242,10 +242,10 @@ function InventoryView() {
     return { label: "Disponible", color: "text-stone-500" };
   };
 
-  const filteredInventory = insumoFilter === "all" 
-    ? inventory 
+  const filteredInventory = insumoFilter === "all"
+    ? inventory
     : inventory.filter(item => item.category === insumoFilter);
-  
+
   const filteredProducts = productoFilter === "all"
     ? menuItems
     : menuItems.filter(item => item.category === productoFilter);
@@ -437,8 +437,8 @@ function InventoryView() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowAddModal(false)} />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative bg-[#121214] border border-stone-800 shadow-2xl p-6 max-w-md w-full">
               <button onClick={() => setShowAddModal(false)} className="absolute top-4 right-4 text-stone-500 hover:text-white"><X className="w-5 h-5" /></button>
-<h2 className="text-xl font-serif text-[#C6A96B] mb-4">Agregar Insumo</h2>
-              
+              <h2 className="text-xl font-serif text-[#C6A96B] mb-4">Agregar Insumo</h2>
+
               <form onSubmit={handleSave} className="space-y-4">
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Nombre</label>
@@ -1016,11 +1016,11 @@ function WasteView() {
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Cantidad</label>
-                  <input type="text" value={newWaste.qty} onChange={(e) => setNewWaste({ ...newWaste, qty: e.target.value })} placeholder="1 porciÃ³n, 500g..." className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2" />
+                  <input type="text" value={newWaste.qty} onChange={(e) => setNewWaste({ ...newWaste, qty: e.target.value })} placeholder="1 porción, 500g..." className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2" />
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Motivo</label>
-                  <input type="text" value={newWaste.reason} onChange={(e) => setNewWaste({ ...newWaste, reason: e.target.value })} placeholder="Se cayÃ³, mal estado..." className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2" />
+                  <input type="text" value={newWaste.reason} onChange={(e) => setNewWaste({ ...newWaste, reason: e.target.value })} placeholder="Se cayó, mal estado..." className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2" />
                 </div>
                 <div className="flex gap-4 pt-4">
                   <button type="button" onClick={() => setShowModal(false)} className="flex-1 border border-stone-800 text-stone-400 py-3 hover:text-white">Cancelar</button>

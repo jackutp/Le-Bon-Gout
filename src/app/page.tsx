@@ -67,10 +67,10 @@ export default function Home() {
             </p>
             <div className="flex flex-col md:flex-row gap-6 mt-4">
               <button onClick={() => setShowJoinModal(true)} className="border-b border-amber-500 text-amber-500 pb-1 uppercase tracking-widest text-sm hover:text-white hover:border-white transition-colors">
-                Quieres formar parte de nosotros?
+                ¿Quieres formar parte de nosotros?
               </button>
               <Link href="/login" className="border-b border-amber-500 text-amber-500 pb-1 uppercase tracking-widest text-sm hover:text-white hover:border-white transition-colors">
-                Ya formas parte de nosotros?
+                ¿Ya formas parte de nosotros?
               </Link>
             </div>
           </motion.div>
