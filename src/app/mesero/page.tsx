@@ -165,13 +165,13 @@ export default function MeseroPage() {
             {currentView === "productos" ? (
               <>
                 <div className="flex gap-2 mb-4">
-                  {["all", "Plato", "Bebida", "Postre"].map((cat) => (
+                  {["all", "PLATO", "BEBIDA", "POSTRE"].map((cat) => (
                     <button
                       key={cat}
                       onClick={() => setCategoryFilter(cat)}
                       className={`px-3 py-1.5 rounded text-xs uppercase tracking-widest transition-colors ${categoryFilter === cat ? "bg-[#C6A96B] text-black" : "border border-stone-800 text-stone-400 hover:text-white hover:border-[#C6A96B]"}`}
                     >
-                      {cat === "all" ? "Todos" : cat === "Plato" ? "Platillos" : cat === "Bebida" ? "Bebidas" : cat}
+                      {cat === "all" ? "Todos" : cat}
                     </button>
                   ))}
                 </div>

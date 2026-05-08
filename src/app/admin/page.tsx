@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LogOut, LayoutDashboard, Package, Users, BookOpen,
-  Calendar, Truck, AlertTriangle, Plus, Edit, Trash, CheckCircle, X, Send, Save, Edit3
+  Calendar, Truck, AlertTriangle, Plus, Edit, Trash, CheckCircle, X, Send, Save, Edit3, FileText, Upload
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,9 +12,11 @@ import Image from "next/image";
 import { useOrders } from "@/context/OrderContext";
 
 type Staff = { id: number; name: string; email: string; role: "Mesero" | "Cocinero"; password: string; notes: string; ordersToday?: number; avgTime?: string };
-type MenuItem = { id: number; name: string; price: number; desc: string; category: "Plato" | "Bebida" | "Postre"; img: string; inStock: number };
+type MenuItem = { id: number; name: string; price: number; desc: string; category: "PLATO" | "BEBIDA" | "POSTRE"; img: string; inStock: number };
 type Waste = { id: number; item: string; qty: string; reason: string; date: string };
 type Reservation = { id: number; name: string; details: string; date: string };
+type PurchaseOrder = { id: string; date: string; total: number; status: "Recibido" | "Pendiente" | "En Camino"; items: { name: string; qty: string; price: number }[] };
+type Supplier = { id: number; name: string; contact: string; specialty: string; quality?: string };
 
 const INITIAL_STAFF: Staff[] = [
   { id: 1, name: "Jean-Paul", email: "jean@lebongout.com", role: "Mesero", password: "", notes: "", ordersToday: 24 },
@@ -32,12 +34,28 @@ const RESERVATIONS: Reservation[] = [
   { id: 2, name: "Empresa Moderna", details: "Mesa 8  19:30 hrs    8 pax", date: "14/Oct" },
 ];
 
-const SUPPLIERS_LIST = [
+const SUPPLIERS_LIST: Supplier[] = [
   { id: 1, name: "Maison de la Truffe", contact: "contact@maisontruffe.com", specialty: "Trufas y Productos Premium" },
   { id: 2, name: "Pesca Directa", contact: "operaciones@pescadirecta.com", specialty: "Mariscos Frescos" },
   { id: 3, name: "Vinos del Valle", contact: "ventas@vinosdelvalle.com", specialty: "Vinos y Licores" },
-  { id: 4, name: "Carniceria Selecta", contact: "pedidos@carnselecta.com", quality: "Carnes Premium" },
+  { id: 4, name: "Carniceria Selecta", contact: "pedidos@carnselecta.com", specialty: "Carnes Premium" },
 ];
+
+const MOCK_POS: Record<number, PurchaseOrder[]> = {
+  1: [
+    { id: "PO-001", date: "2026-04-15", total: 450.00, status: "Recibido", items: [{ name: "Trufa Negra", qty: "500g", price: 400 }, { name: "Aceite Trufa", qty: "2L", price: 50 }] },
+    { id: "PO-005", date: "2026-05-01", total: 120.00, status: "Pendiente", items: [{ name: "Sal de Mar", qty: "10kg", price: 120 }] }
+  ],
+  2: [
+    { id: "PO-002", date: "2026-04-20", total: 850.00, status: "Recibido", items: [{ name: "Langosta", qty: "10kg", price: 600 }, { name: "Ostras", qty: "50 unid", price: 250 }] }
+  ],
+  3: [
+    { id: "PO-003", date: "2026-04-22", total: 1200.00, status: "En Camino", items: [{ name: "Chardonnay", qty: "24 botellas", price: 1200 }] }
+  ],
+  4: [
+    { id: "PO-004", date: "2026-04-25", total: 1500.00, status: "Recibido", items: [{ name: "Filet Mignon", qty: "20kg", price: 1500 }] }
+  ]
+};
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -230,11 +248,11 @@ function InventoryView() {
   const [insumoFilter, setInsumoFilter] = useState<string>("all");
   const [productoFilter, setProductoFilter] = useState<string>("all");
   const [formData, setFormData] = useState({
-    name: "", unit: "kg", stock: "", category: "Plato", price: ""
+    name: "", unit: "kg", stock: "", category: "PLATO", price: ""
   });
 
   const INSUMO_CATEGORIES = ["all", "carnes", "ave", "caza", "pescados", "mariscos", "caviar", "verduras", "especias", "vinos", "bebidas"];
-  const PRODUCTO_CATEGORIES = ["all", "Plato", "Bebida", "Postre"];
+  const PRODUCTO_CATEGORIES = ["all", "PLATO", "BEBIDA", "POSTRE"];
 
   const getStockState = (stock: number) => {
     if (stock === 0) return { label: "Agotado", color: "text-red-500 border-red-500/30 bg-red-900/10" };
@@ -251,7 +269,7 @@ function InventoryView() {
     : menuItems.filter(item => item.category === productoFilter);
 
   const openAddModal = () => {
-    setFormData({ name: "", unit: "kg", stock: "", category: "Plato", price: "" });
+    setFormData({ name: "", unit: "kg", stock: "", category: "PLATO", price: "" });
     setAddType("insumo");
     setShowAddModal(true);
   };
@@ -389,7 +407,7 @@ function InventoryView() {
                 onClick={() => setProductoFilter(cat)}
                 className={`px-2 py-1 rounded text-xs uppercase tracking-widest transition-colors ${productoFilter === cat ? "bg-[#C6A96B] text-black" : "border border-stone-700 text-stone-400 hover:text-white"}`}
               >
-                {cat === "all" ? "Todos" : cat === "Plato" ? "Platillos" : cat === "Bebida" ? "Bebidas" : cat}
+                {cat === "all" ? "Todos" : cat}
               </button>
             ))}
           </div>
@@ -639,10 +657,35 @@ function MenuView() {
   const { menuItems, addMenuItem, updateMenuItem, deleteMenuItem } = useOrders();
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
-  const [newItem, setNewItem] = useState({ name: "", price: "", desc: "", category: "Plato" as "Plato" | "Bebida" | "Postre", img: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800" });
+  const [newItem, setNewItem] = useState({ name: "", price: "", desc: "", category: "PLATO" as "PLATO" | "BEBIDA" | "POSTRE", img: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800" });
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const openEdit = (item: MenuItem) => { setEditingItem(item); setNewItem({ name: item.name, price: item.price.toString(), desc: item.desc, category: item.category, img: item.img }); setShowModal(true); };
-  const openAdd = () => { setEditingItem(null); setNewItem({ name: "", price: "", desc: "", category: "Plato", img: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800" }); setShowModal(true); };
+  const openEdit = (item: MenuItem) => {
+    setEditingItem(item);
+    setNewItem({ name: item.name, price: item.price.toString(), desc: item.desc, category: item.category, img: item.img });
+    setImagePreview(item.img);
+    setShowModal(true);
+  };
+
+  const openAdd = () => {
+    setEditingItem(null);
+    setNewItem({ name: "", price: "", desc: "", category: "PLATO", img: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800" });
+    setImagePreview(null);
+    setShowModal(true);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setImagePreview(base64String);
+        setNewItem({ ...newItem, img: base64String });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const saveItem = (e: React.FormEvent) => {
     e.preventDefault();
@@ -706,23 +749,42 @@ function MenuView() {
               <h2 className="text-2xl font-serif text-[#C6A96B] mb-6">{editingItem ? "Editar Platillo" : "Nuevo Platillo"}</h2>
               <form onSubmit={saveItem} className="space-y-4">
                 <div>
+                  <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Imagen</label>
+                  <div className="flex flex-col gap-4">
+                    {imagePreview && (
+                      <div className="relative w-full h-32 border border-stone-800 rounded overflow-hidden bg-black">
+                        <Image src={imagePreview} alt="Preview" fill className="object-contain" />
+                      </div>
+                    )}
+                    <div className="flex items-center justify-center w-full">
+                      <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-stone-800 rounded-lg cursor-pointer bg-[#0B0B0C] hover:border-[#C6A96B] transition-colors">
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <Upload className="w-6 h-6 text-stone-500 mb-2" />
+                          <p className="text-xs text-stone-500">Click para subir (JPG, PNG)</p>
+                        </div>
+                        <input type="file" className="hidden" accept="image/png, image/jpeg" onChange={handleImageChange} />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div>
                   <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Nombre</label>
-                  <input type="text" value={newItem.name} onChange={(e) => setNewItem({ ...newItem, name: e.target.value })} className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2" />
+                  <input type="text" value={newItem.name} onChange={(e) => setNewItem({ ...newItem, name: e.target.value })} className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2 focus:border-[#C6A96B] outline-none" required />
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Precio</label>
-                  <input type="number" value={newItem.price} onChange={(e) => setNewItem({ ...newItem, price: e.target.value })} className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2" />
+                  <input type="number" value={newItem.price} onChange={(e) => setNewItem({ ...newItem, price: e.target.value })} className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2 focus:border-[#C6A96B] outline-none" required />
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Descripcion</label>
-                  <input type="text" value={newItem.desc} onChange={(e) => setNewItem({ ...newItem, desc: e.target.value })} className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2" />
+                  <input type="text" value={newItem.desc} onChange={(e) => setNewItem({ ...newItem, desc: e.target.value })} className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2 focus:border-[#C6A96B] outline-none" required />
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-stone-400 mb-2">Categoria</label>
-                  <select value={newItem.category} onChange={(e) => setNewItem({ ...newItem, category: e.target.value as "Plato" | "Bebida" | "Postre" })} className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2">
-                    <option>Plato</option>
-                    <option>Bebida</option>
-                    <option>Postre</option>
+                  <select value={newItem.category} onChange={(e) => setNewItem({ ...newItem, category: e.target.value as "PLATO" | "BEBIDA" | "POSTRE" })} className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-2 focus:border-[#C6A96B] outline-none">
+                    <option value="PLATO">PLATO</option>
+                    <option value="BEBIDA">BEBIDA</option>
+                    <option value="POSTRE">POSTRE</option>
                   </select>
                 </div>
                 <div className="flex gap-4 pt-4">
@@ -792,6 +854,11 @@ function SuppliersView() {
   const [requestDescription, setRequestDescription] = useState("");
   const [showSentFeedback, setShowSentFeedback] = useState(false);
 
+  // Nuevos estados para POs y XML
+  const [showPOsModal, setShowPOsModal] = useState(false);
+  const [viewingSupplier, setViewingSupplier] = useState<Supplier | null>(null);
+  const [uploading, setUploading] = useState(false);
+
   const handleSendRequest = () => {
     if (!selectedSupplier || !requestDescription) return;
     setShowSentFeedback(true);
@@ -801,6 +868,20 @@ function SuppliersView() {
       setSelectedSupplier("");
       setRequestDescription("");
     }, 2000);
+  };
+
+  const openPOs = (supplier: Supplier) => {
+    setViewingSupplier(supplier);
+    setShowPOsModal(true);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return;
+    setUploading(true);
+    setTimeout(() => {
+      setUploading(false);
+      alert("Factura XML cargada y procesada correctamente. El inventario ha sido actualizado.");
+    }, 2500);
   };
 
   return (
@@ -815,31 +896,118 @@ function SuppliersView() {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
-        <div className="col-span-2 bg-[#121214] border border-stone-800 rounded p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-[#121214] border border-stone-800 rounded p-6">
           <h2 className="text-xl font-serif text-white mb-6">Directorio de Proveedores</h2>
           <div className="space-y-4">
             {SUPPLIERS_LIST.map(supplier => (
-              <div key={supplier.id} className="p-4 border border-stone-800 rounded flex justify-between items-center">
+              <div key={supplier.id} className="p-4 border border-stone-800 rounded flex justify-between items-center bg-black/20 hover:bg-black/40 transition-colors">
                 <div>
                   <p className="text-sm font-medium">{supplier.name}</p>
-                  <p className="text-xs text-stone-500">{supplier.specialty || supplier.specialty}</p>
+                  <p className="text-xs text-stone-500">{supplier.specialty}</p>
                 </div>
-                <button className="text-xs uppercase tracking-widest text-[#C6A96B] hover:text-white transition-colors">
+                <button 
+                  onClick={() => openPOs(supplier)}
+                  className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C6A96B] border border-[#C6A96B]/30 px-3 py-1.5 rounded hover:bg-[#C6A96B] hover:text-black transition-all"
+                >
+                  <FileText className="w-3.5 h-3.5" />
                   Ver POs
                 </button>
               </div>
             ))}
           </div>
         </div>
+        
         <div className="bg-[#121214] border border-stone-800 rounded p-6 flex flex-col">
           <h2 className="text-xl font-serif text-[#C6A96B] mb-6">Carga de Facturas</h2>
-          <div className="flex-1 border-2 border-dashed border-stone-700 rounded-lg flex flex-col items-center justify-center text-stone-500 hover:border-[#C6A96B] hover:text-[#C6A96B] transition-colors cursor-pointer">
-            <Plus className="w-8 h-8 mb-2" />
-            <p className="text-xs uppercase tracking-widest">Arrastra archivo XML/PDF</p>
+          <div className="flex-1 border-2 border-dashed border-stone-700 rounded-lg flex flex-col items-center justify-center text-stone-500 hover:border-[#C6A96B] hover:text-[#C6A96B] transition-colors cursor-pointer relative group">
+            <input 
+              type="file" 
+              accept=".xml,.pdf" 
+              className="absolute inset-0 opacity-0 cursor-pointer" 
+              onChange={handleFileUpload}
+              disabled={uploading}
+            />
+            {uploading ? (
+              <div className="flex flex-col items-center">
+                <div className="w-8 h-8 border-2 border-[#C6A96B] border-t-transparent rounded-full animate-spin mb-2" />
+                <p className="text-[10px] uppercase tracking-tighter text-[#C6A96B]">Procesando XML...</p>
+              </div>
+            ) : (
+              <>
+                <Upload className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform text-stone-400" />
+                <p className="text-xs uppercase tracking-widest text-center px-4">Arrastra o haz clic para subir XML/PDF</p>
+                <p className="text-[10px] text-stone-600 mt-2">Formato UBL 2.1 aceptado</p>
+              </>
+            )}
           </div>
         </div>
       </div>
+
+      {/* MODAL VER POs */}
+      <AnimatePresence>
+        {showPOsModal && viewingSupplier && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowPOsModal(false)} />
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} className="relative bg-[#121214] border border-stone-800 shadow-2xl p-8 max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+              <button onClick={() => setShowPOsModal(false)} className="absolute top-4 right-4 text-stone-500 hover:text-white"><X className="w-5 h-5" /></button>
+              
+              <div className="mb-6">
+                <h2 className="text-2xl font-serif text-[#C6A96B]">Órdenes de Compra</h2>
+                <p className="text-stone-400 text-sm">Historial para: {viewingSupplier.name}</p>
+              </div>
+
+              <div className="space-y-6">
+                {(MOCK_POS[viewingSupplier.id] || []).length > 0 ? (
+                  MOCK_POS[viewingSupplier.id].map(po => (
+                    <div key={po.id} className="border border-stone-800 rounded overflow-hidden">
+                      <div className="bg-black/40 p-4 border-b border-stone-800 flex justify-between items-center">
+                        <div>
+                          <span className="text-[#C6A96B] font-mono text-sm mr-4">{po.id}</span>
+                          <span className="text-xs text-stone-500 uppercase tracking-widest">{po.date}</span>
+                        </div>
+                        <span className={`text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border ${
+                          po.status === 'Recibido' ? 'border-green-500/50 text-green-500 bg-green-500/10' : 
+                          po.status === 'En Camino' ? 'border-amber-500/50 text-amber-500 bg-amber-500/10' : 
+                          'border-stone-500/50 text-stone-500 bg-stone-500/10'
+                        }`}>
+                          {po.status}
+                        </span>
+                      </div>
+                      <table className="w-full text-left text-xs">
+                        <thead>
+                          <tr className="bg-black/20 text-stone-500 uppercase tracking-tighter">
+                            <th className="p-3">Insumo</th>
+                            <th className="p-3">Cant.</th>
+                            <th className="p-3 text-right">Total</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-stone-800/50">
+                          {po.items.map((item, idx) => (
+                            <tr key={idx}>
+                              <td className="p-3 text-stone-300">{item.name}</td>
+                              <td className="p-3 text-stone-400">{item.qty}</td>
+                              <td className="p-3 text-right text-stone-300">S/ {item.price.toFixed(2)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot>
+                          <tr className="bg-black/10">
+                            <td colSpan={2} className="p-3 text-right font-serif uppercase tracking-widest text-stone-500">Total Orden</td>
+                            <td className="p-3 text-right font-bold text-[#C6A96B]">S/ {po.total.toFixed(2)}</td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center py-12 text-stone-600 italic">No hay órdenes registradas para este proveedor.</p>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* MODAL SOLICITAR PEDIDO */}
       <AnimatePresence>
