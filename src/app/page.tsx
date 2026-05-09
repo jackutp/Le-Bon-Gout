@@ -6,16 +6,18 @@ import { ChevronDown, MapPin, Phone, Clock, X, Upload, FileText } from "lucide-r
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
-import { useOrders } from "@/context/OrderContext";
+import { useProductos } from "@/context/ProductoContext";
 
 export default function Home() {
-  const { menuItems } = useOrders();
+  const { menuItems, loading, error } = useProductos();  // 👈 CAMBIADO: usar useProductos
   const [showMenu, setShowMenu] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showReclamosModal, setShowReclamosModal] = useState(false);
   const [joinForm, setJoinForm] = useState({ name: "", email: "", position: "Mesero", cv: null as File | null });
 
-  const displayItems = showMenu ? menuItems : menuItems.slice(0, 3);
+  // Filtrar solo productos de tipo PLATO para la sección principal
+  const platosPrincipales = menuItems.filter(item => item.categoria === "PLATO");
+  const displayItems = showMenu ? menuItems : platosPrincipales.slice(0, 3);
 
   const handleJoinSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,10 +37,41 @@ export default function Home() {
     input.click();
   };
 
+  // Mostrar loading mientras carga
+  if (loading) {
+    return (
+      <div className="bg-stone-950 text-stone-100 min-h-screen font-sans">
+        <Navbar />
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-stone-400">Cargando nuestra carta...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Mostrar error si hay problema
+  if (error) {
+    return (
+      <div className="bg-stone-950 text-stone-100 min-h-screen font-sans">
+        <Navbar />
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center">
+            <p className="text-red-500 mb-4">Error al cargar los productos</p>
+            <p className="text-stone-400 text-sm">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-stone-950 text-stone-100 min-h-screen font-sans selection:bg-amber-700 selection:text-white">
       <Navbar />
 
+      {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-black/60 z-10" />
@@ -57,6 +90,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Nosotros Section */}
       <section id="nosotros" className="py-32 px-6 bg-stone-950">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
           <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 1 }}>
@@ -80,6 +114,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Menu Section - Creaciones Exclusivas */}
       <section id="menu" className="py-32 px-6 bg-stone-900">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
@@ -89,26 +124,41 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {displayItems.map((dish, i) => (
-              <motion.div key={dish.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.8, delay: i * 0.2 }} className="group cursor-pointer">
-                <div className="relative h-96 w-full mb-6 overflow-hidden">
-                  <Image src={dish.img} alt={dish.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
+              <motion.div key={dish.productoid} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.8, delay: i * 0.2 }} className="group cursor-pointer">
+
+                <div className="relative h-96 w-full mb-6 overflow-hidden bg-stone-800 rounded-lg">
+                  <img
+                    src={dish.imagenUrl || `/api/productos/${dish.productoid}/imagen`}
+                    alt={dish.nombre}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    onError={(e) => {
+                      // Si la imagen falla, mostrar placeholder
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800';
+                    }}
+                  />
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500" />
                 </div>
-                <h4 className="text-2xl font-serif mb-2">{dish.name}</h4>
-                <p className="text-stone-400">{dish.desc}</p>
-                <p className="text-amber-500 mt-2">S/ {dish.price.toFixed(2)}</p>
+                <h4 className="text-2xl font-serif mb-2">{dish.nombre}</h4>
+                <p className="text-stone-400">{dish.descripcion}</p>
+                <p className="text-amber-500 mt-2">S/ {dish.precio.toFixed(2)}</p>
               </motion.div>
             ))}
           </div>
 
-          <div className="text-center mt-16">
-            <button onClick={() => setShowMenu(!showMenu)} className="border border-amber-500 text-amber-500 px-8 py-3 uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-colors">
-              {showMenu ? "Ver Menos" : "Ver Menu Completo"}
-            </button>
-          </div>
+          {menuItems.length > 3 && (
+            <div className="text-center mt-16">
+              <button
+                onClick={() => setShowMenu(!showMenu)}
+                className="border border-amber-500 text-amber-500 px-8 py-3 uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-colors"
+              >
+                {showMenu ? "Ver Menos" : "Ver Menu Completo"}
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
+      {/* Eventos Section */}
       <section id="eventos" className="py-32 px-6 bg-stone-950">
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-amber-500 tracking-[0.2em] uppercase text-sm mb-4">Celebraciones</h2>
@@ -122,6 +172,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Footer */}
       <footer className="bg-black pt-32 pb-12 px-6">
         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-16 mb-20 border-b border-stone-800 pb-20">
           <div className="flex flex-col items-center md:items-start">
@@ -177,6 +228,7 @@ export default function Home() {
         </div>
       </footer>
 
+      {/* Modal Unirse */}
       <AnimatePresence>
         {showJoinModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -198,8 +250,6 @@ export default function Home() {
                   <select value={joinForm.position} onChange={(e) => setJoinForm({ ...joinForm, position: e.target.value })} className="w-full bg-[#0B0B0C] border border-stone-800 text-white px-4 py-3 focus:border-amber-500">
                     <option>Mesero</option>
                     <option>Cocina</option>
-                    <option>Administracion</option>
-                    <option>Bartender</option>
                   </select>
                 </div>
                 <div>
@@ -218,6 +268,7 @@ export default function Home() {
         )}
       </AnimatePresence>
 
+      {/* Modal Reclamos */}
       <AnimatePresence>
         {showReclamosModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
