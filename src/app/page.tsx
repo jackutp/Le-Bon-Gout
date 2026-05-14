@@ -128,11 +128,13 @@ export default function Home() {
 
                 <div className="relative h-96 w-full mb-6 overflow-hidden bg-stone-800 rounded-lg">
                   <img
-                    src={dish.imagenUrl || `/api/productos/${dish.productoid}/imagen`}
+                    src={dish.imagenProducto
+                      ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090/api'}/productos/${dish.productoid}/imagen`
+                      : 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800'
+                    }
                     alt={dish.nombre}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     onError={(e) => {
-                      // Si la imagen falla, mostrar placeholder
                       (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800';
                     }}
                   />

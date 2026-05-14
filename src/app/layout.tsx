@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ProductoProvider>
             <InsumoProvider>
               <MermaProvider>
-                <ProveedorProvider>  {/* 👈 AGREGAR */}
+                <ProveedorProvider>
                   {children}
                 </ProveedorProvider>
               </MermaProvider>
