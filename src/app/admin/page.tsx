@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, LayoutDashboard, Package, Users, BookOpen, Calendar, Truck, AlertTriangle, X } from "lucide-react";
+import { LogOut, LayoutDashboard, Package, Users, BookOpen, Calendar, Truck, AlertTriangle, X, PartyPopper } from "lucide-react";
 import Link from "next/link";
 
 // Componentes
@@ -14,8 +14,12 @@ import { MenuView } from "./components/MenuView";
 import { ReservationsView } from "./components/ReservationsView";
 import { SuppliersView } from "./components/SuppliersView";
 import { WasteView } from "./components/WasteView";
+import { EventsView } from "./components/EventsView";
 
-export default function AdminPage() {
+// Importar el provider de eventos
+import { EventProvider } from "@/context/EventContext";
+
+function AdminContent() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const adminName = "Admin Principal";
@@ -36,6 +40,8 @@ export default function AdminPage() {
         return <SuppliersView />;
       case "mermas":
         return <WasteView />;
+      case "eventos":
+        return <EventsView />;
       default:
         return <DashboardView />;
     }
@@ -47,6 +53,7 @@ export default function AdminPage() {
     { id: "personal", icon: Users, label: "Personal" },
     { id: "carta", icon: BookOpen, label: "Editor Carta" },
     { id: "reservas", icon: Calendar, label: "Reservas" },
+    { id: "eventos", icon: PartyPopper, label: "Eventos" },
     { id: "proveedores", icon: Truck, label: "Proveedores" },
     { id: "mermas", icon: AlertTriangle, label: "Mermas" },
   ];
@@ -79,8 +86,8 @@ export default function AdminPage() {
                 setSidebarOpen(false);
               }}
               className={`w-full flex items-center gap-3 px-3 py-2 lg:py-3 rounded text-sm uppercase tracking-widest transition-colors ${activeTab === item.id
-                  ? "bg-[#C6A96B]/10 text-[#C6A96B] border border-[#C6A96B]/30"
-                  : "text-stone-400 hover:text-white hover:bg-stone-900"
+                ? "bg-[#C6A96B]/10 text-[#C6A96B] border border-[#C6A96B]/30"
+                : "text-stone-400 hover:text-white hover:bg-stone-900"
                 }`}
             >
               <item.icon className="w-4 h-4" />
@@ -130,8 +137,8 @@ export default function AdminPage() {
                     setSidebarOpen(false);
                   }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded text-sm uppercase tracking-widest transition-colors ${activeTab === item.id
-                      ? "bg-[#C6A96B]/10 text-[#C6A96B] border border-[#C6A96B]/30"
-                      : "text-stone-400 hover:text-white hover:bg-stone-900"
+                    ? "bg-[#C6A96B]/10 text-[#C6A96B] border border-[#C6A96B]/30"
+                    : "text-stone-400 hover:text-white hover:bg-stone-900"
                     }`}
                 >
                   <item.icon className="w-4 h-4" />
@@ -177,5 +184,13 @@ export default function AdminPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function AdminPage() {
+  return (
+    <EventProvider>
+      <AdminContent />
+    </EventProvider>
   );
 }
