@@ -14,7 +14,7 @@ export default function EventosPage() {
   return (
     <div className="bg-stone-950 text-stone-100 min-h-screen font-sans selection:bg-amber-700 selection:text-white">
       <Navbar />
-      
+
       {/* Hero */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
@@ -28,7 +28,7 @@ export default function EventosPage() {
           />
         </div>
         <div className="relative z-20 text-center px-4">
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
@@ -36,7 +36,7 @@ export default function EventosPage() {
           >
             Eventos Privados
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.2 }}
@@ -104,67 +104,67 @@ export default function EventosPage() {
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
           <div className="bg-stone-900 border border-stone-800 rounded-3xl p-8 lg:p-12 sticky top-32">
             <h3 className="text-3xl font-serif mb-8 text-center">Solicitud de Cotización</h3>
-            
+
             <form className="space-y-6" onSubmit={e => e.preventDefault()}>
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-stone-500 mb-2">Nombre *</label>
-                  <input required type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full bg-black border border-stone-800 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors" />
+                  <input required type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full bg-black border border-stone-800 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors" />
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-stone-500 mb-2">Apellido *</label>
-                  <input required type="text" value={formData.lastName} onChange={e => setFormData({...formData, lastName: e.target.value})} className="w-full bg-black border border-stone-800 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors" />
+                  <input required type="text" value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} className="w-full bg-black border border-stone-800 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-stone-500 mb-2">Celular *</label>
-                  <input required type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full bg-black border border-stone-800 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors" />
+                  <input required type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="w-full bg-black border border-stone-800 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors" />
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-stone-500 mb-2">Empresa</label>
-                  <input type="text" value={formData.company} onChange={e => setFormData({...formData, company: e.target.value})} className="w-full bg-black border border-stone-800 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors" />
+                  <input type="text" value={formData.company} onChange={e => setFormData({ ...formData, company: e.target.value })} className="w-full bg-black border border-stone-800 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors" />
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs uppercase tracking-widest text-stone-500 mb-2">Correo Electrónico *</label>
-                <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full bg-black border border-stone-800 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors" />
+                <input required type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="w-full bg-black border border-stone-800 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors" />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-stone-500 mb-2">Fecha del Evento *</label>
-                  <input required type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="w-full bg-black border border-stone-800 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors" />
+                  <input required type="date" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} className="w-full bg-black border border-stone-800 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors" />
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-stone-500 mb-2">N° Asistentes *</label>
-                  <input required type="number" min="1" value={formData.attendees} onChange={e => setFormData({...formData, attendees: e.target.value})} className="w-full bg-black border border-stone-800 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors" />
+                  <input required type="number" min="1" value={formData.attendees} onChange={e => setFormData({ ...formData, attendees: e.target.value })} className="w-full bg-black border border-stone-800 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors" />
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs uppercase tracking-widest text-stone-500 mb-2">Comentarios *</label>
-                <textarea required value={formData.comments} onChange={e => setFormData({...formData, comments: e.target.value})} className="w-full bg-black border border-stone-800 rounded-lg p-4 text-white focus:border-amber-500 outline-none transition-colors resize-none h-32"></textarea>
+                <textarea required value={formData.comments} onChange={e => setFormData({ ...formData, comments: e.target.value })} className="w-full bg-black border border-stone-800 rounded-lg p-4 text-white focus:border-amber-500 outline-none transition-colors resize-none h-32"></textarea>
               </div>
 
               <div className="space-y-3 pt-4">
                 <label className="flex items-start gap-3 cursor-pointer group">
-                  <input type="checkbox" required checked={legal.age} onChange={e => setLegal({...legal, age: e.target.checked})} className="mt-1 accent-amber-500 w-4 h-4 cursor-pointer" />
+                  <input type="checkbox" required checked={legal.age} onChange={e => setLegal({ ...legal, age: e.target.checked })} className="mt-1 accent-amber-500 w-4 h-4 cursor-pointer" />
                   <span className="text-sm text-stone-400 group-hover:text-stone-300 transition-colors">Declaro que soy mayor de 18 años *</span>
                 </label>
                 <label className="flex items-start gap-3 cursor-pointer group">
-                  <input type="checkbox" required checked={legal.privacy} onChange={e => setLegal({...legal, privacy: e.target.checked})} className="mt-1 accent-amber-500 w-4 h-4 cursor-pointer" />
+                  <input type="checkbox" required checked={legal.privacy} onChange={e => setLegal({ ...legal, privacy: e.target.checked })} className="mt-1 accent-amber-500 w-4 h-4 cursor-pointer" />
                   <span className="text-sm text-stone-400 group-hover:text-stone-300 transition-colors">He leído y acepto las políticas de privacidad de datos *</span>
                 </label>
                 <label className="flex items-start gap-3 cursor-pointer group">
-                  <input type="checkbox" checked={legal.marketing} onChange={e => setLegal({...legal, marketing: e.target.checked})} className="mt-1 accent-amber-500 w-4 h-4 cursor-pointer" />
+                  <input type="checkbox" checked={legal.marketing} onChange={e => setLegal({ ...legal, marketing: e.target.checked })} className="mt-1 accent-amber-500 w-4 h-4 cursor-pointer" />
                   <span className="text-sm text-stone-400 group-hover:text-stone-300 transition-colors">Acepto el tratamiento de mis datos para fines publicitarios (Opcional)</span>
                 </label>
               </div>
 
-              <button 
+              <button
                 type="submit"
                 disabled={!legal.age || !legal.privacy}
                 className="w-full bg-amber-500 text-black py-4 uppercase tracking-widest text-sm font-medium hover:bg-amber-400 transition-colors mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
