@@ -7,10 +7,7 @@ import { Plus, Edit, Trash, X, Search } from "lucide-react";
 import { useInsumos } from "@/context/InsumoContext";
 import { insumoService } from "@/services/insumoService";
 
-const INSUMO_CATEGORIES = [
-    "all", "carnes", "ave", "caza", "pescados", "mariscos",
-    "caviar", "verduras", "especias", "vinos", "bebidas"
-];
+
 
 const UNIDADES = ["KG", "LATAS", "G", "L", "ML"];
 
@@ -193,20 +190,6 @@ export function InsumosView() {
                 <div className="p-4 border-b border-stone-800 bg-black/20 space-y-4">
                     <div className="flex flex-wrap gap-4 justify-between items-center">
                         <h3 className="text-lg font-serif text-[#C6A96B]">Cuadro de Insumos</h3>
-                        <div className="flex gap-2 flex-wrap">
-                            {INSUMO_CATEGORIES.map((cat) => (
-                                <button
-                                    key={cat}
-                                    onClick={() => setInsumoFilter(cat)}
-                                    className={`px-2 py-1 rounded text-xs uppercase tracking-widest transition-colors ${insumoFilter === cat
-                                            ? "bg-[#C6A96B] text-black"
-                                            : "border border-stone-700 text-stone-400 hover:text-white"
-                                        }`}
-                                >
-                                    {cat === "all" ? "Todos" : cat}
-                                </button>
-                            ))}
-                        </div>
                     </div>
 
                     {/* BUSCADOR */}
