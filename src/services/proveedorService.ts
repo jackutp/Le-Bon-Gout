@@ -24,11 +24,6 @@ export interface OrdenCompra {
     updatedAt?: string;
 }
 
-export interface InsumoProveedor {
-    insumoid: number;
-    nombre: string;
-    unidadMedida: string;
-}
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090/api';
 
@@ -67,11 +62,32 @@ export const proveedorService = {
         return res.json();
     },
 
+    //Antes
+    /*
     async deleteProveedor(id: number): Promise<void> {
         const res = await fetch(`${API_URL}/proveedores/${id}`, {
             method: 'DELETE',
         });
         if (!res.ok) throw new Error('Error al eliminar proveedor');
+    },
+    */
+    //Ahora
+    async deleteProveedor(id: number): Promise<{ success: boolean; message?: string; hasOrdenes?: boolean; ordenesCount?: number }> {
+        const res = await fetch(`${API_URL}/proveedores/${id}`, {
+            method: 'DELETE',
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            // Lanzar error con la información del backend
+            const error = new Error(data.error || 'Error al eliminar proveedor');
+            (error as any).hasOrdenes = data.hasOrdenes;
+            (error as any).ordenesCount = data.ordenesCount;
+            throw error;
+        }
+
+        return data;
     },
 
     // ============ ÓRDENES DE COMPRA ============
@@ -94,18 +110,16 @@ export const proveedorService = {
         return res.json();
     },
 
-    // src/services/proveedorService.ts
-
     async createOrden(proveedorId: number): Promise<OrdenCompra> {
-        console.log('📡 [createOrden] Enviando:', { proveedorId });  // 👈 LOG
+        console.log('📡 [createOrden] Enviando:', { proveedorId });
 
         const res = await fetch(`${API_URL}/proveedores/ordenes`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ proveedorId }),  // 👈 Asegurar formato correcto
+            body: JSON.stringify({ proveedorId }),
         });
 
-        console.log('📡 [createOrden] Response status:', res.status);  // 👈 LOG
+        console.log('📡 [createOrden] Response status:', res.status);
 
         if (!res.ok) {
             const errorText = await res.text();

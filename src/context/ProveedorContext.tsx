@@ -12,7 +12,7 @@ interface ProveedorContextType {
     // Proveedores
     addProveedor: (proveedor: Omit<Proveedor, 'proveedorid'>) => Promise<void>;
     updateProveedor: (id: number, proveedor: Partial<Proveedor>) => Promise<void>;
-    deleteProveedor: (id: number) => Promise<void>;
+    deleteProveedor: (id: number) => Promise<{ success: boolean; message?: string; hasOrdenes?: boolean; ordenesCount?: number }>;
     refreshProveedores: () => Promise<void>;
     // Órdenes
     addOrden: (proveedorId: number) => Promise<void>;
@@ -81,8 +81,22 @@ export function ProveedorProvider({ children }: { children: React.ReactNode }) {
     };
 
     const deleteProveedor = async (id: number) => {
-        await proveedorService.deleteProveedor(id);
-        await refreshProveedores();
+        try {
+            const result = await proveedorService.deleteProveedor(id);
+            await refreshProveedores();
+            return {
+                success: true,
+                message: result.message
+            };
+        } catch (error: any) {
+            console.error('Error en deleteProveedor:', error);
+            return {
+                success: false,
+                message: error.message,
+                hasOrdenes: error.hasOrdenes,
+                ordenesCount: error.ordenesCount
+            };
+        }
     };
 
     // Órdenes
@@ -112,7 +126,7 @@ export function ProveedorProvider({ children }: { children: React.ReactNode }) {
 
     const deleteOrden = async (ordenId: number) => {
         await proveedorService.deleteOrden(ordenId);
-        await refreshOrdenes();
+        await refreshOrdenes();  // ✅ Esto actualiza la lista global
     };
 
     const getOrdenesByProveedor = (proveedorId: number) => {

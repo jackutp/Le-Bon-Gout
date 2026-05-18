@@ -1,11 +1,9 @@
 // src/app/admin/components/SuppliersView.tsx
 "use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, FileText, Upload, X, CheckCircle, Download, Trash, Eye, Plus, Edit } from "lucide-react";
+import { Send, FileText, Upload, X, CheckCircle, Download, Trash, Plus, Edit } from "lucide-react";
 import { useProveedores } from "@/context/ProveedorContext";
-
 export function SuppliersView() {
     const {
         proveedores,
@@ -20,22 +18,27 @@ export function SuppliersView() {
         addProveedor,
         updateProveedor,
         deleteProveedor,
+        deleteOrden,
+        refreshOrdenes,
     } = useProveedores();
-
     // Estados para modales
     const [showRequestModal, setShowRequestModal] = useState(false);
     const [showPOsModal, setShowPOsModal] = useState(false);
     const [showProveedorModal, setShowProveedorModal] = useState(false);
     const [showSentFeedback, setShowSentFeedback] = useState(false);
-
     // Estados para datos
     const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(null);
     const [viewingSupplier, setViewingSupplier] = useState<any | null>(null);
     const [viewingOrdenes, setViewingOrdenes] = useState<any[]>([]);
     const [editingProveedor, setEditingProveedor] = useState<any | null>(null);
     const [uploadingForOrden, setUploadingForOrden] = useState<number | null>(null);
-    const [uploading, setUploading] = useState(false);
-
+    //use efect
+    useEffect(() => {
+        if (viewingSupplier && showPOsModal) {
+            const ordenesProveedor = getOrdenesByProveedor(viewingSupplier.proveedorid);
+            setViewingOrdenes([...ordenesProveedor]);
+        }
+    }, [ordenes, viewingSupplier, showPOsModal]);
     // Formulario proveedor
     const [proveedorForm, setProveedorForm] = useState({
         nombre: "",
@@ -44,9 +47,7 @@ export function SuppliersView() {
         razonSocial: "",
         direccionFiscal: "",
     });
-
-    // ============ PROVEEDORES CRUD ============
-
+    // ============ PROVEEDORES  ============
     const openCreateProveedor = () => {
         setEditingProveedor(null);
         setProveedorForm({
@@ -58,7 +59,6 @@ export function SuppliersView() {
         });
         setShowProveedorModal(true);
     };
-
     const openEditProveedor = (proveedor: any) => {
         setEditingProveedor(proveedor);
         setProveedorForm({
@@ -70,7 +70,6 @@ export function SuppliersView() {
         });
         setShowProveedorModal(true);
     };
-
     const handleSaveProveedor = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -87,15 +86,34 @@ export function SuppliersView() {
             alert('Error al guardar el proveedor');
         }
     };
-
     const handleDeleteProveedor = async (id: number, nombre: string) => {
+        const ordenesDelProveedor = getOrdenesByProveedor(id);
+
+        if (ordenesDelProveedor.length > 0) {
+            const confirmMessage = `⚠️ ELIMINACIÓN BLOQUEADA ⚠️\n\n` +
+                `El proveedor "${nombre}" tiene ${ordenesDelProveedor.length} órden(es) de compra asociadas.\n\n` +
+                `Para eliminar este proveedor, primero debe:\n` +
+                `1. Ir a "VER POS" de este proveedor\n` +
+                `2. Eliminar o completar todas las órdenes asociadas\n\n` +
+                `¿Desea ir a las órdenes de este proveedor ahora?`;
+            if (confirm(confirmMessage)) {
+                openPOs({ proveedorid: id, nombre });
+            }
+            return;
+        }
         if (confirm(`¿Está seguro de eliminar "${nombre}"?`)) {
-            try {
-                await deleteProveedor(id);
-                alert("Proveedor eliminado correctamente");
-            } catch (error) {
-                console.error('Error eliminando proveedor:', error);
-                alert('Error al eliminar el proveedor');
+            const result = await deleteProveedor(id);
+
+            if (result && !result.success) {
+                if (result.hasOrdenes) {
+                    alert(`No se puede eliminar el proveedor "${nombre}"\n\n` +
+                        `Motivo: Tiene ${result.ordenesCount || ''} órden(es) de compra asociadas.\n\n` +
+                        `Solución: Elimine primero todas las órdenes desde "VER POS".`);
+                } else {
+                    alert(`Error al eliminar: ${result.message || 'Error desconocido'}`);
+                }
+            } else if (result?.success !== false) {
+                alert(`Proveedor "${nombre}" eliminado correctamente`);
             }
         }
     };
@@ -130,8 +148,8 @@ export function SuppliersView() {
         try {
             await subirFactura(ordenId, file);
             alert("Factura cargada correctamente");
-            const ordenesProveedor = getOrdenesByProveedor(viewingSupplier?.proveedorid);
-            setViewingOrdenes(ordenesProveedor);
+            await refreshOrdenes();
+
         } catch (error) {
             console.error('Error al subir factura:', error);
             alert('Error al subir la factura');
@@ -139,7 +157,24 @@ export function SuppliersView() {
             setUploadingForOrden(null);
         }
     };
+    const handleEliminarFactura = async (ordenId: number) => {
+        const confirmDelete = confirm(
+            `⚠️ ¿Está seguro de eliminar la factura de la orden #${ordenId}?\n\n` +
+            `Esta acción eliminará permanentemente la factura y no se puede deshacer.`
+        );
 
+        if (!confirmDelete) return;
+
+        try {
+            await eliminarFactura(ordenId);
+            alert("Factura eliminada correctamente");
+            await refreshOrdenes();
+
+        } catch (error) {
+            console.error('Error al eliminar factura:', error);
+            alert('Error al eliminar la factura');
+        }
+    };
     const handleDownloadFactura = async (ordenId: number, nombre: string) => {
         try {
             const blob = await descargarFactura(ordenId);
@@ -160,11 +195,35 @@ export function SuppliersView() {
     const handleEstadoChange = async (ordenId: number, nuevoEstado: string) => {
         try {
             await updateEstadoOrden(ordenId, nuevoEstado);
+            await refreshOrdenes();
             const ordenesProveedor = getOrdenesByProveedor(viewingSupplier?.proveedorid);
             setViewingOrdenes(ordenesProveedor);
         } catch (error) {
             console.error('Error al cambiar estado:', error);
             alert('Error al cambiar el estado');
+        }
+    };
+    const handleDeleteOrden = async (ordenId: number, ordenNumero: string) => {
+        const confirmDelete = confirm(
+            `⚠️ ¿Está seguro de eliminar la orden #${ordenNumero}?\n\n` +
+            `Esta acción eliminará permanentemente la orden y no se puede deshacer.`
+        );
+
+        if (!confirmDelete) return;
+
+        try {
+            await deleteOrden(ordenId);
+            alert(`Orden #${ordenNumero} eliminada correctamente`);
+            await refreshOrdenes();
+            const ordenesActualizadas = getOrdenesByProveedor(viewingSupplier?.proveedorid);
+            setViewingOrdenes(ordenesActualizadas);
+            if (ordenesActualizadas.length === 0) {
+                alert(`El proveedor "${viewingSupplier?.nombre}" ya no tiene órdenes asociadas.`);
+                setTimeout(() => setShowPOsModal(false), 2000);
+            }
+        } catch (error) {
+            console.error('Error al eliminar orden:', error);
+            alert('Error al eliminar la orden. Intente nuevamente.');
         }
     };
 
@@ -202,98 +261,61 @@ export function SuppliersView() {
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Directorio de Proveedores */}
-                <div className="lg:col-span-2 bg-[#121214] border border-stone-800 rounded p-6">
-                    <h2 className="text-xl font-serif text-white mb-6">Directorio de Proveedores</h2>
-                    <div className="space-y-4">
-                        {proveedores.map((proveedor) => (
-                            <div
-                                key={proveedor.proveedorid}
-                                className="p-4 border border-stone-800 rounded flex justify-between items-center bg-black/20 hover:bg-black/40 transition-colors"
-                            >
-                                <div className="flex-1">
-                                    <p className="text-sm font-medium">{proveedor.nombre}</p>
-                                    <div className="flex flex-wrap gap-3 mt-1">
-                                        {proveedor.ruc && (
-                                            <p className="text-xs text-stone-500">RUC: {proveedor.ruc}</p>
-                                        )}
-                                        {proveedor.razonSocial && (
-                                            <p className="text-xs text-stone-500">Razón Social: {proveedor.razonSocial}</p>
-                                        )}
-                                    </div>
-                                    {proveedor.descripcion && (
-                                        <p className="text-xs text-stone-400 mt-1">{proveedor.descripcion}</p>
+            <div className="bg-[#121214] border border-stone-800 rounded p-6">
+                <h2 className="text-xl font-serif text-white mb-6">Directorio de Proveedores</h2>
+                <div className="space-y-4">
+                    {proveedores.map((proveedor) => (
+                        <div
+                            key={proveedor.proveedorid}
+                            className="p-4 border border-stone-800 rounded flex justify-between items-center bg-black/20 hover:bg-black/40 transition-colors"
+                        >
+                            <div className="flex-1">
+                                <p className="text-sm font-medium">{proveedor.nombre}</p>
+                                <div className="flex flex-wrap gap-3 mt-1">
+                                    {proveedor.ruc && (
+                                        <p className="text-xs text-stone-500">RUC: {proveedor.ruc}</p>
                                     )}
-                                    {proveedor.direccionFiscal && (
-                                        <p className="text-xs text-stone-500 mt-1">{proveedor.direccionFiscal}</p>
+                                    {proveedor.razonSocial && (
+                                        <p className="text-xs text-stone-500">Razón Social: {proveedor.razonSocial}</p>
                                     )}
                                 </div>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => openEditProveedor(proveedor)}
-                                        className="p-2 border border-stone-700 hover:border-yellow-500 text-stone-400 hover:text-yellow-500 rounded transition-colors"
-                                    >
-                                        <Edit className="w-4 h-4" />
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            if (proveedor.proveedorid) {
-                                                handleDeleteProveedor(proveedor.proveedorid, proveedor.nombre);
-                                            }
-                                        }}
-                                        className="p-2 border border-stone-700 hover:border-red-500 text-stone-400 hover:text-red-500 rounded transition-colors"
-                                    >
-                                        <Trash className="w-4 h-4" />
-                                    </button>
-                                    <button
-                                        onClick={() => openPOs(proveedor)}
-                                        className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C6A96B] border border-[#C6A96B]/30 px-3 py-1.5 rounded hover:bg-[#C6A96B] hover:text-black transition-all"
-                                    >
-                                        <FileText className="w-3.5 h-3.5" />
-                                        Ver POs
-                                    </button>
-                                </div>
+                                {proveedor.descripcion && (
+                                    <p className="text-xs text-stone-400 mt-1">{proveedor.descripcion}</p>
+                                )}
+                                {proveedor.direccionFiscal && (
+                                    <p className="text-xs text-stone-500 mt-1">{proveedor.direccionFiscal}</p>
+                                )}
                             </div>
-                        ))}
-                        {proveedores.length === 0 && (
-                            <p className="text-center py-4 text-stone-500">No hay proveedores registrados</p>
-                        )}
-                    </div>
-                </div>
-
-                {/* Carga de Facturas */}
-                <div className="bg-[#121214] border border-stone-800 rounded p-6 flex flex-col">
-                    <h2 className="text-xl font-serif text-[#C6A96B] mb-6">Carga de Facturas</h2>
-                    <div className="flex-1 border-2 border-dashed border-stone-700 rounded-lg flex flex-col items-center justify-center text-stone-500 hover:border-[#C6A96B] hover:text-[#C6A96B] transition-colors cursor-pointer relative group">
-                        <input
-                            type="file"
-                            accept=".xml,.pdf"
-                            className="absolute inset-0 opacity-0 cursor-pointer"
-                            onChange={(e) => {
-                                if (e.target.files?.[0]) {
-                                    alert("Selecciona una orden específica para subir la factura desde el modal de POs");
-                                }
-                            }}
-                            disabled={uploading}
-                        />
-                        {uploading ? (
-                            <div className="flex flex-col items-center">
-                                <div className="w-8 h-8 border-2 border-[#C6A96B] border-t-transparent rounded-full animate-spin mb-2" />
-                                <p className="text-[10px] uppercase tracking-tighter text-[#C6A96B]">
-                                    Procesando XML...
-                                </p>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => openEditProveedor(proveedor)}
+                                    className="p-2 border border-stone-700 hover:border-yellow-500 text-stone-400 hover:text-yellow-500 rounded transition-colors"
+                                >
+                                    <Edit className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (proveedor.proveedorid) {
+                                            handleDeleteProveedor(proveedor.proveedorid, proveedor.nombre);
+                                        }
+                                    }}
+                                    className="p-2 border border-stone-700 hover:border-red-500 text-stone-400 hover:text-red-500 rounded transition-colors"
+                                >
+                                    <Trash className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={() => openPOs(proveedor)}
+                                    className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C6A96B] border border-[#C6A96B]/30 px-3 py-1.5 rounded hover:bg-[#C6A96B] hover:text-black transition-all"
+                                >
+                                    <FileText className="w-3.5 h-3.5" />
+                                    Ver POs
+                                </button>
                             </div>
-                        ) : (
-                            <>
-                                <Upload className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform text-stone-400" />
-                                <p className="text-xs uppercase tracking-widest text-center px-4">
-                                    Arrastra o haz clic para subir XML/PDF
-                                </p>
-                                <p className="text-[10px] text-stone-600 mt-2">Formato UBL 2.1 aceptado</p>
-                            </>
-                        )}
-                    </div>
+                        </div>
+                    ))}
+                    {proveedores.length === 0 && (
+                        <p className="text-center py-4 text-stone-500">No hay proveedores registrados</p>
+                    )}
                 </div>
             </div>
 
@@ -495,14 +517,21 @@ export function SuppliersView() {
                                                                     Descargar
                                                                 </button>
                                                                 <button
-                                                                    onClick={() => eliminarFactura(orden.ordenId)}
+                                                                    onClick={() => handleEliminarFactura(orden.ordenId)}
                                                                     className="text-xs bg-red-800/30 hover:bg-red-800/50 text-red-500 px-3 py-1.5 rounded flex items-center gap-2 transition-colors"
                                                                 >
                                                                     <Trash className="w-3.5 h-3.5" />
-                                                                    Eliminar
+                                                                    Eliminar Factura
                                                                 </button>
                                                             </>
                                                         )}
+                                                        <button
+                                                            onClick={() => handleDeleteOrden(orden.ordenId, orden.ordenId.toString())}
+                                                            className="text-xs bg-red-800/30 hover:bg-red-800/50 text-red-500 px-3 py-1.5 rounded flex items-center gap-2 transition-colors"
+                                                        >
+                                                            <Trash className="w-3.5 h-3.5" />
+                                                            Eliminar Orden
+                                                        </button>
                                                     </div>
 
                                                     {uploadingForOrden === orden.ordenId && (
