@@ -13,6 +13,33 @@ export interface Producto {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090/api';
 
 export const productoService = {
+
+    async create(data: Omit<Producto, 'productoid'>): Promise<Producto> {
+        const res = await fetch(`${API_URL}/productos`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Error al crear producto');
+        }
+        return res.json();
+    },
+
+    // ✅ AGREGAR: Actualizar producto con datos JSON (sin imagen)
+    async updateJson(id: number, data: Partial<Producto>): Promise<Producto> {
+        const res = await fetch(`${API_URL}/productos/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Error al actualizar producto');
+        }
+        return res.json();
+    },
     // Obtener todos los productos
     async getAll(): Promise<Producto[]> {
         const url = `${API_URL}/productos`;

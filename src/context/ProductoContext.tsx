@@ -8,14 +8,33 @@ interface ProductoContextType {
     menuItems: Producto[];
     loading: boolean;
     error: string | null;
-    addMenuItem: (item: Omit<Producto, 'productoid'>) => Promise<void>;
-    updateMenuItem: (id: number, item: Partial<Producto>) => Promise<void>;
+    addMenuItem: (item: Omit<Producto, 'productoid'>, imagenFile?: File) => Promise<void>;
+    updateMenuItem: (id: number, item: Partial<Producto>, imagenFile?: File) => Promise<void>;
     updateStock: (id: number, stock: number) => Promise<void>;
     deleteMenuItem: (id: number) => Promise<void>;
     refreshProducts: () => Promise<void>;
 }
 
 const ProductoContext = createContext<ProductoContextType | undefined>(undefined);
+
+// Función helper para convertir objeto a FormData
+const objectToFormData = (data: Record<string, any>, imagenFile?: File): FormData => {
+    const formData = new FormData();
+
+    // Agregar campos del producto
+    if (data.nombre !== undefined) formData.append('nombre', data.nombre);
+    if (data.descripcion !== undefined) formData.append('descripcion', data.descripcion);
+    if (data.precio !== undefined) formData.append('precio', data.precio.toString());
+    if (data.categoria !== undefined) formData.append('categoria', data.categoria);
+    if (data.stock !== undefined) formData.append('stock', data.stock.toString());
+
+    // Agregar imagen si existe
+    if (imagenFile) {
+        formData.append('imagen', imagenFile);
+    }
+
+    return formData;
+};
 
 export function ProductoProvider({ children }: { children: React.ReactNode }) {
     const [menuItems, setMenuItems] = useState<Producto[]>([]);
@@ -43,15 +62,19 @@ export function ProductoProvider({ children }: { children: React.ReactNode }) {
         refreshProducts();
     }, []);
 
-    const addMenuItem = async (item: Omit<Producto, 'productoid'>) => {
+    // ✅ CORREGIDO: addMenuItem ahora acepta imagenFile
+    const addMenuItem = async (item: Omit<Producto, 'productoid'>, imagenFile?: File) => {
         console.log('➕ [ProductoContext] Agregando producto:', item);
-        await productoService.create(item);
+        const formData = objectToFormData(item, imagenFile);
+        await productoService.createWithImage(formData);
         await refreshProducts();
     };
 
-    const updateMenuItem = async (id: number, item: Partial<Producto>) => {
+    // ✅ CORREGIDO: updateMenuItem ahora acepta imagenFile
+    const updateMenuItem = async (id: number, item: Partial<Producto>, imagenFile?: File) => {
         console.log('✏️ [ProductoContext] Actualizando producto:', id, item);
-        await productoService.update(id, item);
+        const formData = objectToFormData(item, imagenFile);
+        await productoService.update(id, formData);
         await refreshProducts();
     };
 

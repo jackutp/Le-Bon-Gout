@@ -32,6 +32,12 @@ export interface CreateEventDTO {
     marketingAccepted?: boolean;
 }
 
+// ✅ AGREGADO: Tipo UpdateStatusDTO
+export interface UpdateStatusDTO {
+    status: EventStatus;
+    reason?: string;
+}
+
 class EventService {
     private async fetchWithError(url: string, options?: RequestInit) {
         try {
@@ -52,7 +58,6 @@ class EventService {
                     const errorData = await response.json();
                     console.error('❌ Error detallado del backend:', errorData);
 
-                    // Capturar errores de validación de Spring Boot
                     if (errorData.errors) {
                         const validationErrors = Object.values(errorData.errors).join(', ');
                         errorMessage = `Errores de validación: ${validationErrors}`;
@@ -85,14 +90,13 @@ class EventService {
     }
 
     async createEvent(eventData: CreateEventDTO): Promise<EventRequest> {
-        // Limpiar y formatear datos correctamente
         const cleanedData = {
             name: eventData.name.trim(),
             lastName: eventData.lastName.trim(),
             email: eventData.email.trim().toLowerCase(),
             phone: eventData.phone.trim(),
             company: eventData.company && eventData.company.trim() !== '' ? eventData.company.trim() : null,
-            date: eventData.date, // Ya viene en formato YYYY-MM-DD
+            date: eventData.date,
             attendees: Number(eventData.attendees),
             comments: eventData.comments.trim(),
             ageConfirmed: Boolean(eventData.ageConfirmed),
@@ -120,7 +124,7 @@ class EventService {
         return this.fetchWithError(`${API_URL}/eventos/${id}`);
     }
 
-    async updateEventStatus(id: number, statusData: { status: EventStatus; reason?: string }): Promise<EventRequest> {
+    async updateEventStatus(id: number, statusData: UpdateStatusDTO): Promise<EventRequest> {
         return this.fetchWithError(`${API_URL}/eventos/${id}/status`, {
             method: 'PATCH',
             headers: {

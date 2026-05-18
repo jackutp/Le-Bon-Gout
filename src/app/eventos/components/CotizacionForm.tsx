@@ -30,6 +30,43 @@ export default function CotizacionForm() {
     return null;
   };
 
+  // ✅ NUEVA FUNCIÓN: Validar teléfono (9 dígitos)
+  const validatePhone = (phone: string): string | null => {
+    const cleanPhone = phone.replace(/\D/g, ''); // Eliminar todo excepto números
+    if (cleanPhone.length === 0) {
+      return "El número de celular es obligatorio";
+    }
+    if (cleanPhone.length !== 9) {
+      return "El número de celular debe tener exactamente 9 dígitos";
+    }
+    return null;
+  };
+
+  // ✅ FUNCIÓN: Manejar cambio de teléfono (solo números, máximo 9)
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Permitir solo números
+    const numericValue = value.replace(/\D/g, '');
+    // Limitar a 9 dígitos
+    const limitedValue = numericValue.slice(0, 9);
+    setFormData({ ...formData, phone: limitedValue });
+  };
+
+  // ✅ NUEVA FUNCIÓN: Validar comentarios
+  const validateComments = (comments: string): string | null => {
+    const trimmedComments = comments.trim();
+    if (trimmedComments.length === 0) {
+      return "Los comentarios son obligatorios";
+    }
+    if (trimmedComments.length < 10) {
+      return `Los comentarios deben tener al menos 10 caracteres (actual: ${trimmedComments.length}). Por favor, brinda más detalles sobre tu evento.`;
+    }
+    if (trimmedComments.length > 1000) {
+      return `Los comentarios no pueden exceder los 1000 caracteres (actual: ${trimmedComments.length})`;
+    }
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -37,6 +74,22 @@ export default function CotizacionForm() {
     const dateError = validateDate(formData.date);
     if (dateError) {
       setSubmitStatus({ type: 'error', message: dateError });
+      setTimeout(() => setSubmitStatus(null), 5000);
+      return;
+    }
+
+    // ✅ AGREGAR: Validar teléfono antes de enviar
+    const phoneError = validatePhone(formData.phone);
+    if (phoneError) {
+      setSubmitStatus({ type: 'error', message: phoneError });
+      setTimeout(() => setSubmitStatus(null), 5000);
+      return;
+    }
+
+    // ✅ AGREGAR: Validar comentarios antes de enviar
+    const commentsError = validateComments(formData.comments);
+    if (commentsError) {
+      setSubmitStatus({ type: 'error', message: commentsError });
       setTimeout(() => setSubmitStatus(null), 5000);
       return;
     }
@@ -62,7 +115,7 @@ export default function CotizacionForm() {
         email: formData.email,
         date: formData.date,
         attendees: parseInt(formData.attendees),
-        comments: formData.comments,
+        comments: formData.comments.trim(),
         ageConfirmed: legal.age,
         privacyAccepted: legal.privacy,
         marketingAccepted: legal.marketing
@@ -77,12 +130,41 @@ export default function CotizacionForm() {
       setLegal({ age: false, privacy: false, marketing: false });
 
     } catch (error: any) {
-      setSubmitStatus({ type: 'error', message: error.message || 'Error al enviar la solicitud. Intenta nuevamente.' });
+      console.error("Error detallado:", error);
+
+      // ✅ MEJORADO: Mostrar mensaje amigable según el error
+      let userMessage = "Error al enviar la solicitud. Intenta nuevamente.";
+
+      if (error.message?.includes("comentarios deben tener entre 10")) {
+        userMessage = "Por favor, completa los comentarios con más detalles (mínimo 10 caracteres). Cuéntanos más sobre tu evento.";
+      } else if (error.message?.includes("nombre debe tener entre")) {
+        userMessage = "El nombre debe tener entre 2 y 100 caracteres.";
+      } else if (error.message?.includes("apellido debe tener entre")) {
+        userMessage = "El apellido debe tener entre 2 y 100 caracteres.";
+      } else if (error.message?.includes("teléfono")) {
+        userMessage = "El número de teléfono debe tener exactamente 9 dígitos.";
+      } else if (error.message?.includes("email")) {
+        userMessage = "El correo electrónico no es válido.";
+      } else if (error.message?.includes("asistentes")) {
+        userMessage = "El número de asistentes debe ser entre 1 y 500.";
+      } else if (error.message) {
+        userMessage = error.message;
+      }
+
+      setSubmitStatus({ type: 'error', message: userMessage });
     } finally {
       setIsSubmitting(false);
       setTimeout(() => setSubmitStatus(null), 5000);
     }
   };
+
+  // Mostrar contador de caracteres para comentarios
+  const commentLength = formData.comments.trim().length;
+  const isCommentValid = commentLength >= 10 && commentLength <= 1000;
+  const showCommentWarning = formData.comments.length > 0 && !isCommentValid;
+
+  // ✅ Validar teléfono para el botón
+  const isPhoneValid = formData.phone.length === 9;
 
   // Obtener fecha mínima (hoy) y máxima (3 meses)
   const today = new Date().toISOString().split('T')[0];
@@ -116,6 +198,21 @@ export default function CotizacionForm() {
               Las reservas solo pueden realizarse con un máximo de 3 meses de anticipación.
             </p>
           </div>
+
+          {/* ✅ NUEVO: Info sobre comentarios */}
+          <div className="mt-4 p-3 bg-stone-800/30 rounded-lg">
+            <p className="text-xs text-stone-400">
+              💡 Los comentarios deben tener al menos 10 caracteres.
+              Cuéntanos más sobre tu evento (tipo de evento, requisitos especiales, etc.)
+            </p>
+          </div>
+
+          {/* ✅ NUEVO: Info sobre teléfono */}
+          <div className="mt-4 p-3 bg-stone-800/30 rounded-lg">
+            <p className="text-xs text-stone-400">
+              📱 El número de celular debe tener exactamente 9 dígitos (ejemplo: 987654321)
+            </p>
+          </div>
         </motion.div>
 
         {/* Columna Derecha - Formulario Minimalista */}
@@ -138,28 +235,26 @@ export default function CotizacionForm() {
             {/* Fila 1 */}
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <label htmlFor="name" className="block text-xs uppercase tracking-wider text-stone-500 mb-1">Nombre *</label>
                 <input
                   id="name"
                   required
                   type="text"
-                  placeholder="Su nombre"
+                  placeholder="Nombre *"
                   value={formData.name}
                   onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  className="bg-transparent border-b border-stone-700 pb-2 pt-4 text-white placeholder:text-stone-500 focus:border-amber-500 outline-none transition-colors w-full"
+                  className="bg-black text-white border-b border-stone-700 pb-2 pt-4 placeholder:text-stone-500 focus:border-amber-500 outline-none transition-colors w-full"
                   disabled={isSubmitting}
                 />
               </div>
               <div>
-                <label htmlFor="lastName" className="block text-xs uppercase tracking-wider text-stone-500 mb-1">Apellido *</label>
                 <input
                   id="lastName"
                   required
                   type="text"
-                  placeholder="Su apellido"
+                  placeholder="Apellido *"
                   value={formData.lastName}
                   onChange={e => setFormData({ ...formData, lastName: e.target.value })}
-                  className="bg-transparent border-b border-stone-700 pb-2 pt-4 text-white placeholder:text-stone-500 focus:border-amber-500 outline-none transition-colors w-full"
+                  className="bg-black text-white border-b border-stone-700 pb-2 pt-4 placeholder:text-stone-500 focus:border-amber-500 outline-none transition-colors w-full"
                   disabled={isSubmitting}
                 />
               </div>
@@ -168,27 +263,35 @@ export default function CotizacionForm() {
             {/* Fila 2 */}
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <label htmlFor="phone" className="block text-xs uppercase tracking-wider text-stone-500 mb-1">Celular *</label>
                 <input
                   id="phone"
                   required
                   type="tel"
-                  placeholder="+51 999 999 999"
+                  inputMode="numeric"
+                  pattern="\d{9}"
+                  placeholder="Celular *"
                   value={formData.phone}
-                  onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                  className="bg-transparent border-b border-stone-700 pb-2 pt-4 text-white placeholder:text-stone-500 focus:border-amber-500 outline-none transition-colors w-full"
+                  onChange={handlePhoneChange}
+                  className={`bg-black text-white border-b pb-2 pt-4 placeholder:text-stone-500 focus:border-amber-500 outline-none transition-colors w-full ${formData.phone.length > 0 && formData.phone.length !== 9 ? 'border-red-500/50' : 'border-stone-700'
+                    }`}
                   disabled={isSubmitting}
                 />
+                {/* Indicador visual de validación del teléfono */}
+                {formData.phone.length > 0 && (
+                  <p className={`text-xs mt-1 ${formData.phone.length === 9 ? 'text-green-400' : 'text-red-400'}`}>
+                    {formData.phone.length === 9 ? '✅ Válido' : `❌ Debe tener 9 dígitos (actual: ${formData.phone.length})`}
+                  </p>
+                )}
               </div>
               <div>
-                <label htmlFor="company" className="block text-xs uppercase tracking-wider text-stone-500 mb-1">Empresa</label>
                 <input
                   id="company"
+                  required
                   type="text"
-                  placeholder="Nombre de su empresa"
+                  placeholder="Empresa *"
                   value={formData.company}
                   onChange={e => setFormData({ ...formData, company: e.target.value })}
-                  className="bg-transparent border-b border-stone-700 pb-2 pt-4 text-white placeholder:text-stone-500 focus:border-amber-500 outline-none transition-colors w-full"
+                  className="bg-black text-white border-b border-stone-700 pb-2 pt-4 placeholder:text-stone-500 focus:border-amber-500 outline-none transition-colors w-full"
                   disabled={isSubmitting}
                 />
               </div>
@@ -197,20 +300,18 @@ export default function CotizacionForm() {
             {/* Fila 3 */}
             <div className="grid grid-cols-2 gap-6">
               <div className="relative">
-                <label htmlFor="email" className="block text-xs uppercase tracking-wider text-stone-500 mb-1">Correo *</label>
                 <input
                   id="email"
                   required
                   type="email"
-                  placeholder="ejemplo@dominio.com"
+                  placeholder="Correo *"
                   value={formData.email}
                   onChange={e => setFormData({ ...formData, email: e.target.value })}
-                  className="bg-transparent border-b border-stone-700 pb-2 pt-4 text-white placeholder:text-stone-500 focus:border-amber-500 outline-none transition-colors w-full"
+                  className="bg-black text-white border-b border-stone-700 pb-2 pt-4 placeholder:text-stone-500 focus:border-amber-500 outline-none transition-colors w-full"
                   disabled={isSubmitting}
                 />
               </div>
               <div className="relative">
-                <label htmlFor="date" className="block text-xs uppercase tracking-wider text-stone-500 mb-1">Fecha del evento *</label>
                 <input
                   id="date"
                   required
@@ -219,7 +320,7 @@ export default function CotizacionForm() {
                   max={maxDateStr}
                   value={formData.date}
                   onChange={e => setFormData({ ...formData, date: e.target.value })}
-                  className="bg-transparent border-b border-stone-700 pb-2 pt-4 text-white placeholder:text-stone-500 focus:border-amber-500 outline-none transition-colors w-full [color-scheme:dark]"
+                  className="bg-black text-white border-b border-stone-700 pb-2 pt-4 placeholder:text-stone-500 focus:border-amber-500 outline-none transition-colors w-full [color-scheme:dark]"
                   disabled={isSubmitting}
                 />
                 <p className="text-xs text-stone-500 mt-1">
@@ -230,34 +331,49 @@ export default function CotizacionForm() {
 
             {/* Fila 4 */}
             <div>
-              <label htmlFor="attendees" className="block text-xs uppercase tracking-wider text-stone-500 mb-1">Número de asistentes *</label>
               <input
                 id="attendees"
                 required
                 type="number"
                 min="1"
                 max="500"
-                placeholder="Cantidad de invitados"
+                placeholder="Número de asistentes *"
                 value={formData.attendees}
                 onChange={e => setFormData({ ...formData, attendees: e.target.value })}
-                className="bg-transparent border-b border-stone-700 pb-2 pt-4 text-white placeholder:text-stone-500 focus:border-amber-500 outline-none transition-colors w-full"
+                className="bg-black text-white border-b border-stone-700 pb-2 pt-4 placeholder:text-stone-500 focus:border-amber-500 outline-none transition-colors w-full"
                 disabled={isSubmitting}
               />
             </div>
 
-            {/* Fila 5 */}
+            {/* Fila 5 - Comentarios con contador y validación visual */}
             <div>
-              <label htmlFor="comments" className="block text-xs uppercase tracking-wider text-stone-500 mb-1">Comentarios *</label>
               <textarea
                 id="comments"
                 required
                 rows={4}
-                placeholder="Cuéntenos los detalles de su evento..."
+                placeholder="Comentarios *"
                 value={formData.comments}
                 onChange={e => setFormData({ ...formData, comments: e.target.value })}
-                className="bg-transparent border-b border-stone-700 pb-2 pt-4 text-white placeholder:text-stone-500 focus:border-amber-500 outline-none transition-colors w-full resize-none"
+                className={`bg-black text-white border-b pb-2 pt-4 placeholder:text-stone-500 focus:border-amber-500 outline-none transition-colors w-full resize-none ${showCommentWarning ? 'border-red-500/50' : 'border-stone-700'
+                  }`}
                 disabled={isSubmitting}
               />
+              {/* Contador de caracteres */}
+              <div className="flex justify-between mt-1">
+                <p className={`text-xs ${showCommentWarning ? 'text-red-400' : 'text-stone-500'}`}>
+                  {commentLength} / 1000 caracteres
+                </p>
+                {commentLength > 0 && commentLength < 10 && (
+                  <p className="text-xs text-red-400">
+                    ❌ Faltan {10 - commentLength} caracteres
+                  </p>
+                )}
+                {commentLength >= 10 && commentLength <= 1000 && (
+                  <p className="text-xs text-green-400">
+                    ✅ Válido
+                  </p>
+                )}
+              </div>
             </div>
 
             <p className="mt-6 text-right text-xs text-stone-500">*Campos obligatorios</p>
@@ -299,7 +415,7 @@ export default function CotizacionForm() {
 
             <button
               type="submit"
-              disabled={!legal.age || !legal.privacy || isSubmitting}
+              disabled={!legal.age || !legal.privacy || isSubmitting || !isCommentValid || !isPhoneValid}
               className="mx-auto block mt-8 rounded-full bg-transparent border-2 border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-black px-8 py-3 uppercase font-serif tracking-wide transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Enviando...' : 'Solicitar Información'}
