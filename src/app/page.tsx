@@ -9,7 +9,7 @@ import Navbar from "../components/Navbar";
 import { useProductos } from "@/context/ProductoContext";
 
 export default function Home() {
-  const { menuItems, loading, error } = useProductos();  // 👈 CAMBIADO: usar useProductos
+  const { menuItems, loading, error } = useProductos();
   const [showMenu, setShowMenu] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showReclamosModal, setShowReclamosModal] = useState(false);
