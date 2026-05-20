@@ -18,7 +18,7 @@ export function EstadosMesa({ setInvoiceModal }: Props) {
   useEffect(() => {
     const interval = setInterval(() => {
       refreshMesas();
-    }, 3000); // ← Cada 3 segundos
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [refreshMesas]);
