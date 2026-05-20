@@ -1,4 +1,5 @@
 // src/app/admin/components/MenuView.tsx
+
 "use client";
 
 import { useState } from "react";
@@ -11,6 +12,7 @@ export function MenuView() {
     const { menuItems, loading, refreshProducts, error } = useProductos();
     const [showModal, setShowModal] = useState(false);
     const [editingItem, setEditingItem] = useState<any>(null);
+    const [imageTimestamp, setImageTimestamp] = useState(Date.now()); // ← AGREGAR
     const [newItem, setNewItem] = useState({
         nombre: "",
         precio: "",
@@ -66,7 +68,6 @@ export function MenuView() {
         setSaving(true);
 
         try {
-            // Siempre usar FormData porque el backend espera multipart/form-data
             const formData = new FormData();
             formData.append("nombre", newItem.nombre);
             formData.append("descripcion", newItem.descripcion);
@@ -85,6 +86,7 @@ export function MenuView() {
 
             setShowModal(false);
             await refreshProducts();
+            setImageTimestamp(Date.now()); // ← ACTUALIZAR TIMESTAMP después de guardar
         } catch (error: any) {
             console.error('Error guardando producto:', error);
             alert(`Error al guardar el producto: ${error.message}`);
@@ -98,6 +100,7 @@ export function MenuView() {
             try {
                 await productoService.delete(id);
                 await refreshProducts();
+                setImageTimestamp(Date.now()); // ← ACTUALIZAR TIMESTAMP después de eliminar
             } catch (error: any) {
                 console.error('Error eliminando producto:', error);
                 alert(`Error al eliminar el producto: ${error.message}`);
@@ -157,7 +160,7 @@ export function MenuView() {
                             <div className="w-32 h-32 relative flex-shrink-0">
                                 {item.imagenProducto ? (
                                     <img
-                                        src={productoService.getImageUrl(item.productoid)}
+                                        src={`${productoService.getImageUrl(item.productoid)}?t=${imageTimestamp}`} // ← AGREGAR TIMESTAMP
                                         alt={item.nombre}
                                         className="w-full h-full object-cover"
                                         onError={(e) => {
@@ -205,9 +208,10 @@ export function MenuView() {
                 </div>
             )}
 
-            {/* MODAL */}
+            {/* MODAL - igual como lo tenías */}
             <AnimatePresence>
                 {showModal && (
+                    // ... tu modal existente
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                         <motion.div
                             initial={{ opacity: 0 }}

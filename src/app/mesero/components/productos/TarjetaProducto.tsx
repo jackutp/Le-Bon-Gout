@@ -1,31 +1,48 @@
-//src/app/mesero/components/productos/TarjetaProducto.tsx
+// src/app/mesero/components/productos/TarjetaProducto.tsx
+
+"use client";
+
 import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
-import Image from "next/image";
+import { useState } from "react";
 
-interface Product {
+interface ProductoProps {
   id: number;
   name: string;
   price: number;
   desc: string;
-  img: string;
+  category: string;
   inStock: number;
 }
 
 interface Props {
-  product: Product;
+  product: ProductoProps;
   addToOrder: (id: number) => void;
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090/api';
+
 export function TarjetaProducto({ product, addToOrder }: Props) {
+  const [imgError, setImgError] = useState(false);
+
+  const imageUrl = imgError
+    ? "/placeholder.jpg"
+    : `${API_BASE_URL}/productos/${product.id}/imagen`;
+
   return (
     <motion.div
       whileHover={{ scale: 1.01 }}
       className={`bg-[#121214] border ${product.inStock === 0 ? "border-red-900/50 opacity-70" : "border-stone-800"
         } rounded overflow-hidden flex flex-col`}
     >
-      <div className="relative h-32 w-full">
-        <Image src={product.img} alt={product.name} fill className="object-cover" />
+      <div className="relative h-32 w-full bg-stone-900 overflow-hidden">
+        {/* Usar img normal en lugar de Next.js Image */}
+        <img
+          src={imageUrl}
+          alt={product.name}
+          className="w-full h-full object-cover"
+          onError={() => setImgError(true)}
+        />
         <div className="absolute top-2 right-2">
           <span
             className={`text-xs font-bold px-2 py-0.5 rounded-full ${product.inStock > 0
@@ -40,7 +57,7 @@ export function TarjetaProducto({ product, addToOrder }: Props) {
       <div className="p-3 flex-1 flex flex-col justify-between">
         <div>
           <h3 className="font-serif text-base mb-0.5">{product.name}</h3>
-          <p className="text-xs text-stone-400 mb-2">{product.desc}</p>
+          <p className="text-xs text-stone-400 mb-2 line-clamp-2">{product.desc}</p>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-base font-medium text-[#C6A96B]">S/ {product.price.toFixed(2)}</span>

@@ -1,6 +1,9 @@
-//src/app/mesero/components/productos/CatalogoProductos.tsx
+// src/app/mesero/components/productos/CatalogoProductos.tsx
+
+"use client";
+
 import { useState } from "react";
-import { useMenuLocal } from "@/context/MenuLocalContext";
+import { useProductos } from "@/context/ProductoContext";
 import { FiltroCategorias } from "./FiltroCategorias";
 import { TarjetaProducto } from "./TarjetaProducto";
 
@@ -9,12 +12,30 @@ interface Props {
 }
 
 export function CatalogoProductos({ addToOrder }: Props) {
-  const { menuItems } = useMenuLocal();
+  const { menuItems, loading } = useProductos();
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C6A96B]"></div>
+      </div>
+    );
+  }
+
+  // Mapear para el mesero - solo los campos que necesita TarjetaProducto
+  const productosMapeados = menuItems.map(item => ({
+    id: item.productoid!,
+    name: item.nombre,
+    price: item.precio,
+    desc: item.descripcion,
+    category: item.categoria,
+    inStock: item.stock,
+  }));
+
   const filteredItems = categoryFilter === "all"
-    ? menuItems
-    : menuItems.filter(item => item.category === categoryFilter);
+    ? productosMapeados
+    : productosMapeados.filter(item => item.category === categoryFilter);
 
   return (
     <>

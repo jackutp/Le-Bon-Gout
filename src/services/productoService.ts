@@ -83,7 +83,7 @@ export const productoService = {
     // Actualizar solo stock
     async updateStock(id: number, stock: number): Promise<Producto> {
         const res = await fetch(`${API_URL}/productos/${id}/stock`, {
-            method: 'PATCH',
+            method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ stock }),
         });
@@ -100,7 +100,11 @@ export const productoService = {
     },
 
     // Obtener URL de imagen
-    getImageUrl(id: number): string {
-        return `${API_URL}/productos/${id}/imagen`;
+    getImageUrl(id: number, timestamp?: number): string {
+        const url = `${API_URL}/productos/${id}/imagen`;
+        if (timestamp) {
+            return `${url}?t=${timestamp}`;
+        }
+        return url;
     },
 };

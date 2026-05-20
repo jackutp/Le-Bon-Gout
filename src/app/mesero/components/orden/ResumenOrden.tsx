@@ -1,10 +1,21 @@
 // src/app/mesero/components/orden/ResumenOrden.tsx
 
-import { ShoppingCart, X, Plus, Minus } from "lucide-react";
-import { MenuItem } from "@/context/MenuLocalContext";
+import { ShoppingCart, Minus, Plus } from "lucide-react";
+
+// Tipo flexible que acepta tanto inglés como español
+interface OrderItemDisplay {
+  id: number;
+  // Español
+  nombre?: string;
+  precio?: number;
+  // Inglés
+  name?: string;
+  price?: number;
+  qty: number;
+}
 
 interface Props {
-  orderItems: (MenuItem & { qty: number })[];
+  orderItems: OrderItemDisplay[];
   total: number;
   removeFromOrder: (id: number) => void;
   addToOrder: (id: number) => void;
@@ -31,31 +42,41 @@ export function ResumenOrden({
         {orderItems.length === 0 ? (
           <p className="text-stone-500 text-sm text-center py-8">No hay productos agregados</p>
         ) : (
-          orderItems.map((item) => (
-            <div key={item.id} className="bg-[#121214] p-3 rounded border border-stone-800">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <p className="text-sm font-medium text-white">{item.name}</p>
-                  <p className="text-xs text-stone-400">S/ {item.price}</p>
+          orderItems.map((item) => {
+            // Obtener nombre y precio en inglés o español
+            const displayName = item.nombre || item.name || "";
+            const displayPrice = item.precio ?? item.price ?? 0;
+
+            return (
+              <div key={item.id} className="bg-[#121214] p-3 rounded border border-stone-800">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <p className="text-sm font-medium text-white">{displayName}</p>
+                    <p className="text-xs text-stone-400">S/ {displayPrice.toFixed(2)}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => removeFromOrder(item.id)}
+                      className="p-1 hover:bg-stone-800 rounded transition-colors"
+                    >
+                      <Minus className="w-3 h-3 text-stone-400" />
+                    </button>
+                    <span className="text-sm text-white w-6 text-center">{item.qty}</span>
+                    <button
+                      onClick={() => addToOrder(item.id)}
+                      className="p-1 hover:bg-stone-800 rounded transition-colors"
+                    >
+                      <Plus className="w-3 h-3 text-stone-400" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => removeFromOrder(item.id)}
-                    className="p-1 hover:bg-stone-800 rounded transition-colors"
-                  >
-                    <Minus className="w-3 h-3 text-stone-400" />
-                  </button>
-                  <span className="text-sm text-white w-6 text-center">{item.qty}</span>
-                  <button
-                    onClick={() => addToOrder(item.id)}
-                    className="p-1 hover:bg-stone-800 rounded transition-colors"
-                  >
-                    <Plus className="w-3 h-3 text-stone-400" />
-                  </button>
+                {/* Mostrar subtotal del item */}
+                <div className="text-right text-xs text-[#C6A96B]">
+                  Subtotal: S/ {(displayPrice * item.qty).toFixed(2)}
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 

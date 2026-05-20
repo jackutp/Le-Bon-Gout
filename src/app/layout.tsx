@@ -1,8 +1,7 @@
+// src/app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { InventarioLocalProvider } from "@/context/InventarioLocalContext";
-import { MenuLocalProvider } from "@/context/MenuLocalContext";
 import { PedidoProvider } from "@/context/PedidoContext";
 import { ProductoProvider } from "@/context/ProductoContext";
 import { InsumoProvider } from "@/context/InsumoContext";
@@ -33,23 +32,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <body>
-        <InventarioLocalProvider>
-          <MenuLocalProvider>
-            <PedidoProvider>
-              <ProductoProvider>
-                <InsumoProvider>
-                  <MermaProvider>
-                    <ProveedorProvider>
-                      <MesaProvider>
-                        {children}
-                      </MesaProvider>
-                    </ProveedorProvider>
-                  </MermaProvider>
-                </InsumoProvider>
-              </ProductoProvider>
-            </PedidoProvider>
-          </MenuLocalProvider>
-        </InventarioLocalProvider>
+        <PedidoProvider>
+          <ProductoProvider>
+            <InsumoProvider>
+              <MermaProvider>
+                <ProveedorProvider>
+                  <MesaProvider>
+                    {children}
+                  </MesaProvider>
+                </ProveedorProvider>
+              </MermaProvider>
+            </InsumoProvider>
+          </ProductoProvider>
+        </PedidoProvider>
       </body>
     </html>
   );

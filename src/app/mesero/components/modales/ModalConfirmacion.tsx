@@ -1,14 +1,23 @@
 // src/app/mesero/components/modales/ModalConfirmacion.tsx
 
-import { X } from "lucide-react";
-import { MenuItem } from "@/context/MenuLocalContext";
+import { X, Loader2 } from "lucide-react";
+
+interface OrderItemDisplay {
+  id: number;
+  nombre?: string;
+  precio?: number;
+  name?: string;
+  price?: number;
+  qty: number;
+}
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  orderItems: (MenuItem & { qty: number })[];
+  orderItems: OrderItemDisplay[];
   total: number;
   handleConfirm: () => void;
+  isLoading?: boolean;
 }
 
 export function ModalConfirmacion({
@@ -17,6 +26,7 @@ export function ModalConfirmacion({
   orderItems,
   total,
   handleConfirm,
+  isLoading = false,
 }: Props) {
   if (!isOpen) return null;
 
@@ -29,6 +39,7 @@ export function ModalConfirmacion({
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-stone-400 hover:text-white"
+            disabled={isLoading}
           >
             <X className="w-5 h-5" />
           </button>
@@ -36,12 +47,17 @@ export function ModalConfirmacion({
           <h3 className="text-xl font-serif text-[#C6A96B] mb-4">Confirmar Pedido</h3>
 
           <div className="space-y-3 mb-4 max-h-96 overflow-y-auto">
-            {orderItems.map((item) => (
-              <div key={item.id} className="flex justify-between text-sm">
-                <span>{item.name} x{item.qty}</span>
-                <span className="text-[#C6A96B]">S/ {(item.price * item.qty).toFixed(2)}</span>
-              </div>
-            ))}
+            {orderItems.map((item) => {
+              const displayName = item.nombre || item.name || "";
+              const displayPrice = item.precio ?? item.price ?? 0;
+
+              return (
+                <div key={item.id} className="flex justify-between text-sm">
+                  <span>{displayName} x{item.qty}</span>
+                  <span className="text-[#C6A96B]">S/ {(displayPrice * item.qty).toFixed(2)}</span>
+                </div>
+              );
+            })}
           </div>
 
           <div className="border-t border-stone-800 pt-3 mb-6">
@@ -53,9 +69,11 @@ export function ModalConfirmacion({
 
           <button
             onClick={handleConfirm}
-            className="w-full bg-[#C6A96B] text-black py-2 rounded text-sm uppercase tracking-widest font-semibold hover:bg-[#B8955A] transition-colors"
+            disabled={isLoading || orderItems.length === 0}
+            className="w-full bg-[#C6A96B] text-black py-2 rounded text-sm uppercase tracking-widest font-semibold hover:bg-[#B8955A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Confirmar y Enviar a Cocina
+            {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+            {isLoading ? "Enviando..." : "Confirmar y Enviar a Cocina"}
           </button>
         </div>
       </div>

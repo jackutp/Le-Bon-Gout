@@ -2,6 +2,7 @@
 
 "use client";
 
+import { useEffect } from "react";
 import { useMesa } from "@/context/MesaContext";
 import { InvoiceData } from "../../types";
 import { TarjetaMesa } from "./TarjetaMesa";
@@ -11,7 +12,16 @@ interface Props {
 }
 
 export function EstadosMesa({ setInvoiceModal }: Props) {
-  const { mesas, isLoading } = useMesa();
+  const { mesas, isLoading, refreshMesas } = useMesa();
+
+  // 🔄 Polling: actualizar mesas cada 3 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshMesas();
+    }, 3000); // ← Cada 3 segundos
+
+    return () => clearInterval(interval);
+  }, [refreshMesas]);
 
   const tables = mesas.map(mesa => ({
     id: mesa.id,

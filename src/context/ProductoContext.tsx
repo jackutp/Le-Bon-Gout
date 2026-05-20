@@ -73,7 +73,22 @@ export function ProductoProvider({ children }: { children: React.ReactNode }) {
     // ✅ CORREGIDO: updateMenuItem ahora acepta imagenFile
     const updateMenuItem = async (id: number, item: Partial<Producto>, imagenFile?: File) => {
         console.log('✏️ [ProductoContext] Actualizando producto:', id, item);
-        const formData = objectToFormData(item, imagenFile);
+
+        // Crear FormData
+        const formData = new FormData();
+
+        // Agregar campos del producto
+        if (item.nombre !== undefined) formData.append('nombre', item.nombre);
+        if (item.descripcion !== undefined) formData.append('descripcion', item.descripcion);
+        if (item.precio !== undefined) formData.append('precio', item.precio.toString());
+        if (item.categoria !== undefined) formData.append('categoria', item.categoria);
+        if (item.stock !== undefined) formData.append('stock', item.stock.toString());
+
+        // Agregar imagen si se seleccionó una nueva
+        if (imagenFile) {
+            formData.append('imagen', imagenFile);
+        }
+
         await productoService.update(id, formData);
         await refreshProducts();
     };
@@ -111,3 +126,4 @@ export function useProductos() {
     if (!context) throw new Error('useProductos must be used within ProductoProvider');
     return context;
 }
+

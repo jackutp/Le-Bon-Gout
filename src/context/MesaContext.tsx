@@ -14,6 +14,7 @@ interface MesaContextType {
     error: string | null;
     successMessage: string | null;
     fetchMesas: () => Promise<void>;
+    refreshMesas: () => Promise<void>;
     createMesa: (data: CreateMesaDTO) => Promise<Mesa | null>;
     updateMesa: (id: number, data: UpdateMesaDTO) => Promise<Mesa | null>;
     deleteMesa: (id: number) => Promise<boolean>;
@@ -56,7 +57,9 @@ export function MesaProvider({ children }: { children: ReactNode }) {
             setIsLoading(false);
         }
     };
-
+    const refreshMesas = async () => {
+        await fetchMesas();
+    };
     const createMesa = async (data: CreateMesaDTO): Promise<Mesa | null> => {
         try {
             const newMesa = await mesaService.createMesa(data);
@@ -127,6 +130,7 @@ export function MesaProvider({ children }: { children: ReactNode }) {
                 error,
                 successMessage,
                 fetchMesas,
+                refreshMesas,
                 createMesa,
                 updateMesa,
                 deleteMesa,

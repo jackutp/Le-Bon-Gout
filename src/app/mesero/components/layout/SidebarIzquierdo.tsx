@@ -1,14 +1,11 @@
 // src/app/mesero/components/layout/SidebarIzquierdo.tsx
-
 import { LogOut, Package, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { ViewType } from "../../types";
-
 interface Props {
   currentView: ViewType;
   setCurrentView: (v: ViewType) => void;
 }
-
 export function SidebarIzquierdo({
   currentView,
   setCurrentView,
