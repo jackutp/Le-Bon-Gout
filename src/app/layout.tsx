@@ -8,7 +8,7 @@ import { ProductoProvider } from "@/context/ProductoContext";
 import { InsumoProvider } from "@/context/InsumoContext";
 import { MermaProvider } from "@/context/MermaContext";
 import { ProveedorProvider } from "@/context/ProveedorContext";
-
+import { MesaProvider } from "@/context/MesaContext";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -40,7 +40,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <InsumoProvider>
                   <MermaProvider>
                     <ProveedorProvider>
-                      {children}
+                      <MesaProvider>
+                        {children}
+                      </MesaProvider>
                     </ProveedorProvider>
                   </MermaProvider>
                 </InsumoProvider>

@@ -1,8 +1,10 @@
-//src/app/mesero/components/mesas/TarjetaMesa.tsx
+// src/app/mesero/components/mesas/TarjetaMesa.tsx
+
 import { motion } from "framer-motion";
 import { Receipt } from "lucide-react";
 import Image from "next/image";
 import { InvoiceData, TableData } from "../../types";
+import { getTableImage } from "../../utils/tableImages";
 
 interface Props {
   table: TableData;
@@ -17,7 +19,12 @@ export function TarjetaMesa({ table, setInvoiceModal }: Props) {
         } rounded overflow-hidden flex flex-col`}
     >
       <div className="relative h-24 w-full">
-        <Image src={table.img} alt={`Mesa ${table.number}`} fill className="object-cover opacity-60" />
+        <Image
+          src={getTableImage(table.number)}
+          alt={`Mesa ${table.number}`}
+          fill
+          className="object-cover opacity-60"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
         <div className="absolute bottom-2 left-2">
           <h3 className="font-serif text-lg text-white">Mesa {table.number}</h3>

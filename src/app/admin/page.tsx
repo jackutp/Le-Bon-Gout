@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, LayoutDashboard, Package, Users, BookOpen, Calendar, Truck, AlertTriangle, X, PartyPopper } from "lucide-react";
+import { LogOut, LayoutDashboard, Package, Users, BookOpen, Calendar, Truck, AlertTriangle, X, PartyPopper, TableIcon } from "lucide-react";
 import Link from "next/link";
 
 // Componentes
@@ -15,9 +15,11 @@ import { ReservationsView } from "./components/ReservationsView";
 import { SuppliersView } from "./components/SuppliersView";
 import { WasteView } from "./components/WasteView";
 import { EventsView } from "./components/EventsView";
+import { MesasView } from "./components/MesasView";
 
-// Importar el provider de eventos
+// Importar providers
 import { EventProvider } from "@/context/EventContext";
+import { MesaProvider } from "@/context/MesaContext"; // ← AGREGAR
 
 function AdminContent() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -42,6 +44,8 @@ function AdminContent() {
         return <WasteView />;
       case "eventos":
         return <EventsView />;
+      case "mesas":
+        return <MesasView />;
       default:
         return <DashboardView />;
     }
@@ -56,6 +60,7 @@ function AdminContent() {
     { id: "eventos", icon: PartyPopper, label: "Eventos" },
     { id: "proveedores", icon: Truck, label: "Proveedores" },
     { id: "mermas", icon: AlertTriangle, label: "Mermas" },
+    { id: "mesas", icon: TableIcon, label: "Mesas" },
   ];
 
   return (
@@ -190,7 +195,9 @@ function AdminContent() {
 export default function AdminPage() {
   return (
     <EventProvider>
-      <AdminContent />
+      <MesaProvider> {/* ← AGREGAR */}
+        <AdminContent />
+      </MesaProvider>
     </EventProvider>
   );
 }

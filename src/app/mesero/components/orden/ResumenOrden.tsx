@@ -1,12 +1,10 @@
-//src/app/mesero/components/orden/ResumenOrden.tsx
-import { AnimatePresence } from "framer-motion";
-import { Send, ShoppingBag } from "lucide-react";
-import { OrderItemState } from "../../types";
-import { ItemOrden } from "./ItemOrden";
+// src/app/mesero/components/orden/ResumenOrden.tsx
+
+import { ShoppingCart, X, Plus, Minus } from "lucide-react";
+import { MenuItem } from "@/context/MenuLocalContext";
 
 interface Props {
-  selectedTable: string;
-  orderItems: (OrderItemState & { name: string; price: number; inStock: number })[];
+  orderItems: (MenuItem & { qty: number })[];
   total: number;
   removeFromOrder: (id: number) => void;
   addToOrder: (id: number) => void;
@@ -14,7 +12,6 @@ interface Props {
 }
 
 export function ResumenOrden({
-  selectedTable,
   orderItems,
   total,
   removeFromOrder,
@@ -22,47 +19,59 @@ export function ResumenOrden({
   setShowModal,
 }: Props) {
   return (
-    <>
-      <div className="p-4 border-b border-stone-800 bg-black/20">
-        <h2 className="text-lg font-serif text-[#C6A96B] flex items-center gap-2">
-          <ShoppingBag className="w-4 h-4" />
-          Mesa {selectedTable}
-        </h2>
+    <div className="h-full flex flex-col">
+      <div className="p-4 border-b border-stone-800">
+        <h3 className="font-serif text-[#C6A96B] uppercase tracking-widest text-sm flex items-center gap-2">
+          <ShoppingCart className="w-4 h-4" />
+          Orden Actual
+        </h3>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {orderItems.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-stone-500 text-xs italic text-center">
-            No hay productos seleccionados.
-          </div>
+          <p className="text-stone-500 text-sm text-center py-8">No hay productos agregados</p>
         ) : (
-          <AnimatePresence>
-            {orderItems.map((item) => (
-              <ItemOrden
-                key={item.id}
-                item={item}
-                removeFromOrder={removeFromOrder}
-                addToOrder={addToOrder}
-              />
-            ))}
-          </AnimatePresence>
+          orderItems.map((item) => (
+            <div key={item.id} className="bg-[#121214] p-3 rounded border border-stone-800">
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <p className="text-sm font-medium text-white">{item.name}</p>
+                  <p className="text-xs text-stone-400">S/ {item.price}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => removeFromOrder(item.id)}
+                    className="p-1 hover:bg-stone-800 rounded transition-colors"
+                  >
+                    <Minus className="w-3 h-3 text-stone-400" />
+                  </button>
+                  <span className="text-sm text-white w-6 text-center">{item.qty}</span>
+                  <button
+                    onClick={() => addToOrder(item.id)}
+                    className="p-1 hover:bg-stone-800 rounded transition-colors"
+                  >
+                    <Plus className="w-3 h-3 text-stone-400" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
         )}
       </div>
 
-      <div className="p-4 border-t border-stone-800 bg-black/20">
-        <div className="flex justify-between items-center mb-3">
-          <span className="text-xs text-stone-400 uppercase tracking-widest">Total</span>
-          <span className="text-xl font-serif text-[#C6A96B]">S/ {total.toFixed(2)}</span>
+      <div className="p-4 border-t border-stone-800 space-y-3">
+        <div className="flex justify-between text-sm">
+          <span className="text-stone-400">Total:</span>
+          <span className="font-serif text-[#C6A96B]">S/ {total.toFixed(2)}</span>
         </div>
         <button
           onClick={() => setShowModal(true)}
           disabled={orderItems.length === 0}
-          className="w-full bg-[#C6A96B] hover:bg-white text-black font-medium uppercase tracking-widest text-xs py-3 transition-colors disabled:opacity-50 disabled:hover:bg-[#C6A96B] flex justify-center items-center gap-1.5"
+          className="w-full bg-[#C6A96B] text-black py-2 rounded text-sm uppercase tracking-widest font-semibold hover:bg-[#B8955A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Send className="w-3 h-3" />
-          Enviar a Cocina
+          Confirmar Pedido
         </button>
       </div>
-    </>
+    </div>
   );
 }

@@ -1,11 +1,11 @@
+// src/app/mesero/page.tsx
+
 "use client";
 
 import { useState } from "react";
 import { usePedidos } from "@/context/PedidoContext";
 import { useMenuLocal } from "@/context/MenuLocalContext";
-
 import { ViewType, OrderItemState, InvoiceData } from "./types";
-import { MOCK_TABLES } from "./utils";
 
 import { SidebarIzquierdo } from "./components/layout/SidebarIzquierdo";
 import { SidebarDerecho } from "./components/layout/SidebarDerecho";
@@ -20,12 +20,10 @@ export default function MeseroPage() {
   const { menuItems } = useMenuLocal();
   const waiterName = "Jean-Paul";
 
-  const [selectedTable, setSelectedTable] = useState("1");
   const [currentView, setCurrentView] = useState<ViewType>("productos");
   const [order, setOrder] = useState<OrderItemState[]>([]);
 
   const [showModal, setShowModal] = useState(false);
-  const [showSentModal, setShowSentModal] = useState(false);
   const [invoiceModal, setInvoiceModal] = useState<InvoiceData | null>(null);
 
   const addToOrder = (id: number) => {
@@ -60,6 +58,9 @@ export default function MeseroPage() {
   const total = orderItems.reduce((acc, item) => acc + item.price * item.qty, 0);
 
   const handleConfirm = () => {
+    // Nota: selectedTable ya no existe. Deberás definir de dónde viene la mesa seleccionada.
+    // Por ahora usamos un valor temporal o lo manejas desde otro lado.
+    const selectedTable = 1; // TEMPORAL - AJUSTAR SEGÚN NECESIDAD
     const itemsForContext = orderItems.map(item => ({
       id: Date.now() + item.id,
       productId: item.id,
@@ -67,11 +68,10 @@ export default function MeseroPage() {
       price: item.price,
       qty: item.qty,
     }));
-    addOrder(parseInt(selectedTable), itemsForContext);
+    addOrder(selectedTable, itemsForContext);
     alert(`Orden enviada a cocina para la Mesa ${selectedTable}`);
     setOrder([]);
     setShowModal(false);
-    setShowSentModal(false);
   };
 
   return (
@@ -80,11 +80,8 @@ export default function MeseroPage() {
         <SidebarIzquierdo
           currentView={currentView}
           setCurrentView={setCurrentView}
-          selectedTable={selectedTable}
-          setSelectedTable={setSelectedTable}
         />
 
-        {/* COLUMNA 2: CONTENIDO CENTRAL */}
         <div className="col-span-8 flex flex-col h-screen overflow-hidden">
           <header className="flex justify-between items-center p-4 border-b border-stone-800 bg-[#121214]/80 backdrop-blur">
             <div>
@@ -97,21 +94,15 @@ export default function MeseroPage() {
 
           <main className="flex-1 overflow-y-auto p-4">
             {currentView === "productos" ? (
-              <CatalogoProductos
-                addToOrder={addToOrder}
-              />
+              <CatalogoProductos addToOrder={addToOrder} />
             ) : (
-              <EstadosMesa
-                tables={MOCK_TABLES}
-                setInvoiceModal={setInvoiceModal}
-              />
+              <EstadosMesa setInvoiceModal={setInvoiceModal} />
             )}
           </main>
         </div>
 
         <SidebarDerecho>
           <ResumenOrden
-            selectedTable={selectedTable}
             orderItems={orderItems}
             total={total}
             removeFromOrder={removeFromOrder}
@@ -124,7 +115,6 @@ export default function MeseroPage() {
       <ModalConfirmacion
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        selectedTable={selectedTable}
         orderItems={orderItems}
         total={total}
         handleConfirm={handleConfirm}

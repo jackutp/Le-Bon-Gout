@@ -1,19 +1,12 @@
-//src/app/mesero/components/modales/ModalConfirmacion.tsx
-import { X } from "lucide-react";
-import { ModalWrapper } from "./ModalWrapper";
+// src/app/mesero/components/modales/ModalConfirmacion.tsx
 
-interface OrderItem {
-  id: number;
-  name: string;
-  price: number;
-  qty: number;
-}
+import { X } from "lucide-react";
+import { MenuItem } from "@/context/MenuLocalContext";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  selectedTable: string;
-  orderItems: OrderItem[];
+  orderItems: (MenuItem & { qty: number })[];
   total: number;
   handleConfirm: () => void;
 }
@@ -21,46 +14,51 @@ interface Props {
 export function ModalConfirmacion({
   isOpen,
   onClose,
-  selectedTable,
   orderItems,
   total,
   handleConfirm,
 }: Props) {
+  if (!isOpen) return null;
+
   return (
-    <ModalWrapper isOpen={isOpen} onClose={onClose} maxWidth="md">
-      <button onClick={onClose} className="absolute top-3 right-3 text-stone-500 hover:text-white">
-        <X className="w-4 h-4" />
-      </button>
-      <h2 className="text-xl font-serif text-[#C6A96B] mb-1">Resumen de Orden</h2>
-      <p className="text-stone-400 text-xs mb-4 uppercase tracking-widest">Mesa {selectedTable}</p>
-      <div className="space-y-2 mb-4 max-h-40 overflow-y-auto pr-2">
-        {orderItems.map((item) => (
-          <div key={item.id} className="flex justify-between text-xs">
-            <span>
-              <span className="text-[#C6A96B] mr-1">{item.qty}x</span> {item.name}
-            </span>
-            <span className="text-stone-400">S/ {(item.price * item.qty).toFixed(2)}</span>
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="flex items-center justify-center min-h-screen px-4">
+        <div className="fixed inset-0 bg-black/80" onClick={onClose} />
+
+        <div className="relative bg-[#121214] rounded-lg w-full max-w-md p-6 border border-stone-800">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-stone-400 hover:text-white"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          <h3 className="text-xl font-serif text-[#C6A96B] mb-4">Confirmar Pedido</h3>
+
+          <div className="space-y-3 mb-4 max-h-96 overflow-y-auto">
+            {orderItems.map((item) => (
+              <div key={item.id} className="flex justify-between text-sm">
+                <span>{item.name} x{item.qty}</span>
+                <span className="text-[#C6A96B]">S/ {(item.price * item.qty).toFixed(2)}</span>
+              </div>
+            ))}
           </div>
-        ))}
+
+          <div className="border-t border-stone-800 pt-3 mb-6">
+            <div className="flex justify-between font-semibold">
+              <span>Total</span>
+              <span className="text-[#C6A96B]">S/ {total.toFixed(2)}</span>
+            </div>
+          </div>
+
+          <button
+            onClick={handleConfirm}
+            className="w-full bg-[#C6A96B] text-black py-2 rounded text-sm uppercase tracking-widest font-semibold hover:bg-[#B8955A] transition-colors"
+          >
+            Confirmar y Enviar a Cocina
+          </button>
+        </div>
       </div>
-      <div className="border-t border-stone-800 pt-3 flex justify-between items-center mb-6">
-        <span className="font-serif text-sm">Total Final</span>
-        <span className="font-serif text-lg text-[#C6A96B]">S/ {total.toFixed(2)}</span>
-      </div>
-      <div className="flex gap-2">
-        <button
-          onClick={onClose}
-          className="flex-1 border border-stone-800 text-stone-400 uppercase tracking-widest text-xs py-2 hover:text-white transition-colors"
-        >
-          Cancelar
-        </button>
-        <button
-          onClick={handleConfirm}
-          className="flex-1 bg-[#C6A96B] text-black uppercase tracking-widest text-xs py-2 hover:bg-white transition-colors"
-        >
-          Confirmar
-        </button>
-      </div>
-    </ModalWrapper>
+    </div>
   );
 }

@@ -1,4 +1,5 @@
-//src/app/mesero/components/layout/SidebarIzquierdo.tsx
+// src/app/mesero/components/layout/SidebarIzquierdo.tsx
+
 import { LogOut, Package, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { ViewType } from "../../types";
@@ -6,15 +7,11 @@ import { ViewType } from "../../types";
 interface Props {
   currentView: ViewType;
   setCurrentView: (v: ViewType) => void;
-  selectedTable: string;
-  setSelectedTable: (v: string) => void;
 }
 
 export function SidebarIzquierdo({
   currentView,
   setCurrentView,
-  selectedTable,
-  setSelectedTable,
 }: Props) {
   return (
     <div className="col-span-2 bg-[#121214] border-r border-stone-800 flex flex-col h-screen sticky top-0 overflow-y-auto">
@@ -48,20 +45,6 @@ export function SidebarIzquierdo({
       </nav>
 
       <div className="p-3 border-t border-stone-800">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs text-stone-400 uppercase tracking-widest">mesa:</span>
-          <select
-            value={selectedTable}
-            onChange={(e) => setSelectedTable(e.target.value)}
-            className="bg-[#0B0B0C] border border-stone-800 text-white px-2 py-1 text-sm w-20"
-          >
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
-        </div>
         <Link
           href="/login"
           className="flex items-center justify-center gap-2 w-full px-3 py-2 text-xs text-stone-400 hover:text-white uppercase tracking-widest transition-colors"
