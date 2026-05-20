@@ -1,6 +1,6 @@
 //src/app/mesero/components/productos/CatalogoProductos.tsx
 import { useState } from "react";
-import { useOrders } from "@/context/OrderContext";
+import { useMenuLocal } from "@/context/MenuLocalContext";
 import { FiltroCategorias } from "./FiltroCategorias";
 import { TarjetaProducto } from "./TarjetaProducto";
 
@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function CatalogoProductos({ addToOrder }: Props) {
-  const { menuItems } = useOrders();
+  const { menuItems } = useMenuLocal();
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
 
   const filteredItems = categoryFilter === "all"

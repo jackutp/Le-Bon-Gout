@@ -1,5 +1,5 @@
+//src/app/mesero/utils.ts
 import { TableData } from "./types";
-
 export const MOCK_TABLES: TableData[] = [
   { id: 1, number: 1, occupied: true, total: 145.00, img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400" },
   { id: 2, number: 2, occupied: true, total: 89.50, img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400" },

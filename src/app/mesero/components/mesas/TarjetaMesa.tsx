@@ -1,3 +1,4 @@
+//src/app/mesero/components/mesas/TarjetaMesa.tsx
 import { motion } from "framer-motion";
 import { Receipt } from "lucide-react";
 import Image from "next/image";
@@ -12,9 +13,8 @@ export function TarjetaMesa({ table, setInvoiceModal }: Props) {
   return (
     <motion.div
       whileHover={{ scale: 1.01 }}
-      className={`bg-[#121214] border ${
-        table.occupied ? "border-stone-800" : "border-stone-800/50"
-      } rounded overflow-hidden flex flex-col`}
+      className={`bg-[#121214] border ${table.status === "OCUPADO" ? "border-stone-800" : "border-stone-800/50"
+        } rounded overflow-hidden flex flex-col`}
     >
       <div className="relative h-24 w-full">
         <Image src={table.img} alt={`Mesa ${table.number}`} fill className="object-cover opacity-60" />
@@ -24,7 +24,7 @@ export function TarjetaMesa({ table, setInvoiceModal }: Props) {
         </div>
       </div>
       <div className="p-3">
-        {table.occupied ? (
+        {table.status === "OCUPADO" ? (
           <>
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs text-stone-400">Total:</span>

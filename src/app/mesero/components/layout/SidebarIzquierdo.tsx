@@ -1,3 +1,4 @@
+//src/app/mesero/components/layout/SidebarIzquierdo.tsx
 import { LogOut, Package, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { ViewType } from "../../types";
@@ -26,8 +27,8 @@ export function SidebarIzquierdo({
         <button
           onClick={() => setCurrentView("productos")}
           className={`w-full flex items-center gap-2 px-3 py-2.5 rounded text-sm uppercase tracking-widest transition-colors ${currentView === "productos"
-              ? "bg-[#C6A96B]/10 text-[#C6A96B] border border-[#C6A96B]/30"
-              : "text-stone-400 hover:text-white hover:bg-stone-900 border border-transparent"
+            ? "bg-[#C6A96B]/10 text-[#C6A96B] border border-[#C6A96B]/30"
+            : "text-stone-400 hover:text-white hover:bg-stone-900 border border-transparent"
             }`}
         >
           <Package className="w-4 h-4" />
@@ -37,8 +38,8 @@ export function SidebarIzquierdo({
         <button
           onClick={() => setCurrentView("estados")}
           className={`w-full flex items-center gap-2 px-3 py-2.5 rounded text-sm uppercase tracking-widest transition-colors ${currentView === "estados"
-              ? "bg-[#C6A96B]/10 text-[#C6A96B] border border-[#C6A96B]/30"
-              : "text-stone-400 hover:text-white hover:bg-stone-900 border border-transparent"
+            ? "bg-[#C6A96B]/10 text-[#C6A96B] border border-[#C6A96B]/30"
+            : "text-stone-400 hover:text-white hover:bg-stone-900 border border-transparent"
             }`}
         >
           <LayoutGrid className="w-4 h-4" />

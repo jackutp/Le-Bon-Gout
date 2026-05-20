@@ -1,3 +1,4 @@
+//src/app/mesero/components/orden/ItemOrden.tsx
 import { motion } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
 import { OrderItemState } from "../../types";

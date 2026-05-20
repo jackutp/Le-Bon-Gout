@@ -1,3 +1,4 @@
+//src/app/mesero/components/layout/SidebarDerecho.tsx
 import { ReactNode } from "react";
 
 interface Props {

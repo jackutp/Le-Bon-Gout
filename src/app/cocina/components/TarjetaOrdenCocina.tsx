@@ -1,3 +1,4 @@
+//src/app/cocina/components/TarjetaOrdenCocina.tsx
 import { motion } from "framer-motion";
 import { CheckCircle, Clock } from "lucide-react";
 import { Order } from "../types";
@@ -23,9 +24,8 @@ export function TarjetaOrdenCocina({ order, toggleItemCompletion, markOrderServe
     >
       {/* Order Header */}
       <div
-        className={`p-3 lg:p-4 border-b border-stone-800 flex justify-between items-center ${
-          isAllCompleted ? "bg-[#C6A96B]/10" : "bg-black/40"
-        }`}
+        className={`p-3 lg:p-4 border-b border-stone-800 flex justify-between items-center ${isAllCompleted ? "bg-[#C6A96B]/10" : "bg-black/40"
+          }`}
       >
         <div>
           <h2 className="text-xl lg:text-2xl font-serif text-[#C6A96B]">Mesa {order.table}</h2>

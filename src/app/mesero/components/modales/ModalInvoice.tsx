@@ -1,3 +1,4 @@
+//src/app/mesero/components/modales/ModalInvoice.tsx
 import { X, FileText, Receipt } from "lucide-react";
 import { ModalWrapper } from "./ModalWrapper";
 import { InvoiceData } from "../../types";

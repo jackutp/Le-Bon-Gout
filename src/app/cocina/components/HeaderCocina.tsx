@@ -1,3 +1,4 @@
+//src/app/cocina/components/HeaderCocina.tsx
 import { ChefHat, LogOut } from "lucide-react";
 import Link from "next/link";
 

@@ -1,3 +1,4 @@
+//src/app/mesero/components/orden/ResumenOrden.tsx
 import { AnimatePresence } from "framer-motion";
 import { Send, ShoppingBag } from "lucide-react";
 import { OrderItemState } from "../../types";

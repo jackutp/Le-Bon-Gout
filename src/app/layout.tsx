@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { OrderProvider } from "@/context/OrderContext";
+import { InventarioLocalProvider } from "@/context/InventarioLocalContext";
+import { MenuLocalProvider } from "@/context/MenuLocalContext";
+import { PedidoProvider } from "@/context/PedidoContext";
 import { ProductoProvider } from "@/context/ProductoContext";
 import { InsumoProvider } from "@/context/InsumoContext";
 import { MermaProvider } from "@/context/MermaContext";
@@ -31,17 +33,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <body>
-        <OrderProvider>
-          <ProductoProvider>
-            <InsumoProvider>
-              <MermaProvider>
-                <ProveedorProvider>
-                  {children}
-                </ProveedorProvider>
-              </MermaProvider>
-            </InsumoProvider>
-          </ProductoProvider>
-        </OrderProvider>
+        <InventarioLocalProvider>
+          <MenuLocalProvider>
+            <PedidoProvider>
+              <ProductoProvider>
+                <InsumoProvider>
+                  <MermaProvider>
+                    <ProveedorProvider>
+                      {children}
+                    </ProveedorProvider>
+                  </MermaProvider>
+                </InsumoProvider>
+              </ProductoProvider>
+            </PedidoProvider>
+          </MenuLocalProvider>
+        </InventarioLocalProvider>
       </body>
     </html>
   );

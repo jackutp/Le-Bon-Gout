@@ -1,3 +1,4 @@
+//src/app/cocina/types.ts
 export type OrderItem = {
   id: number;
   name: string;

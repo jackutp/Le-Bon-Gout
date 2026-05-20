@@ -1,3 +1,4 @@
+//src/app/mesero/components/modales/ModalConfirmacion.tsx
 import { X } from "lucide-react";
 import { ModalWrapper } from "./ModalWrapper";
 

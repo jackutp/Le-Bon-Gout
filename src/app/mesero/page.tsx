@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useOrders } from "@/context/OrderContext";
+import { usePedidos } from "@/context/PedidoContext";
+import { useMenuLocal } from "@/context/MenuLocalContext";
 
 import { ViewType, OrderItemState, InvoiceData } from "./types";
 import { MOCK_TABLES } from "./utils";
@@ -15,7 +16,8 @@ import { ModalConfirmacion } from "./components/modales/ModalConfirmacion";
 import { ModalInvoice } from "./components/modales/ModalInvoice";
 
 export default function MeseroPage() {
-  const { addOrder, menuItems } = useOrders();
+  const { addOrder } = usePedidos();
+  const { menuItems } = useMenuLocal();
   const waiterName = "Jean-Paul";
 
   const [selectedTable, setSelectedTable] = useState("1");

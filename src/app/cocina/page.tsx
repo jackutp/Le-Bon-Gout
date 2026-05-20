@@ -1,5 +1,5 @@
+//src/app/cocina/page.tsx
 "use client";
-
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { CheckCircle } from "lucide-react";

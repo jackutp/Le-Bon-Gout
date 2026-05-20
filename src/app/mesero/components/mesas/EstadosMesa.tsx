@@ -1,3 +1,4 @@
+//src/app/mesero/components/mesas/EstadosMesa.tsx
 import { TableData, InvoiceData } from "../../types";
 import { TarjetaMesa } from "./TarjetaMesa";
 
