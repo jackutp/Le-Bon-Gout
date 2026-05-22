@@ -1,14 +1,12 @@
+// src/app/login/page.tsx
 "use client";
-
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import Login from "./Login";
 import Registro from "./Registro";
-
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState<"login" | "registro">("login");
-
   return (
     <div className="bg-[#0B0B0C] min-h-screen font-sans selection:bg-[#C6A96B] selection:text-white flex flex-col">
       <nav className="w-full p-4 md:p-6 absolute top-0 z-10">
@@ -23,26 +21,23 @@ export default function LoginPage() {
           <div className="w-16 hidden sm:block" />
         </div>
       </nav>
-
       <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-6 relative z-0 mt-20">
         <div className="w-full max-w-md flex justify-center mb-6 border-b border-stone-800">
           <button
             onClick={() => setActiveTab("login")}
-            className={`flex-1 pb-3 text-sm font-medium uppercase tracking-widest transition-colors ${
-              activeTab === "login"
-                ? "text-[#C6A96B] border-b-2 border-[#C6A96B]"
-                : "text-stone-500 hover:text-stone-300"
-            }`}
+            className={`flex-1 pb-3 text-sm font-medium uppercase tracking-widest transition-colors ${activeTab === "login"
+              ? "text-[#C6A96B] border-b-2 border-[#C6A96B]"
+              : "text-stone-500 hover:text-stone-300"
+              }`}
           >
             Iniciar Sesión
           </button>
           <button
             onClick={() => setActiveTab("registro")}
-            className={`flex-1 pb-3 text-sm font-medium uppercase tracking-widest transition-colors ${
-              activeTab === "registro"
-                ? "text-[#C6A96B] border-b-2 border-[#C6A96B]"
-                : "text-stone-500 hover:text-stone-300"
-            }`}
+            className={`flex-1 pb-3 text-sm font-medium uppercase tracking-widest transition-colors ${activeTab === "registro"
+              ? "text-[#C6A96B] border-b-2 border-[#C6A96B]"
+              : "text-stone-500 hover:text-stone-300"
+              }`}
           >
             Registrarse
           </button>

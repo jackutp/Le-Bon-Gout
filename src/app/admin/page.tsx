@@ -1,10 +1,11 @@
 // src/app/admin/page.tsx
-"use client";
 
+"use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LogOut, LayoutDashboard, Package, Users, BookOpen, Calendar, Truck, AlertTriangle, X, PartyPopper, TableIcon, FileText } from "lucide-react";
-import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import { ConfirmModal } from "@/components/ConfirmModal";
 
 // Componentes
 import { DashboardView } from "./components/DashboardView";
@@ -20,12 +21,22 @@ import { ComprobantesView } from "./components/ComprobantesView";
 
 // Importar providers
 import { EventProvider } from "@/context/EventContext";
-import { MesaProvider } from "@/context/MesaContext"; // ← AGREGAR
+import { MesaProvider } from "@/context/MesaContext";
+import { UserProvider } from "@/context/UserContext";
 
 function AdminContent() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const adminName = "Admin Principal";
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const { user, logout } = useAuth();  // ← Agregar 'user'
+
+  // Obtener nombre completo del administrador
+  const adminName = user ? `${user.nombre} ${user.apellido || ''}` : "Admin Principal";
+
+  const handleLogout = () => {
+    logout();
+    setShowConfirmModal(false);
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -64,7 +75,7 @@ function AdminContent() {
     { id: "proveedores", icon: Truck, label: "Proveedores" },
     { id: "mermas", icon: AlertTriangle, label: "Mermas" },
     { id: "mesas", icon: TableIcon, label: "Mesas" },
-    { id: "comprobantes", icon: FileText, label: "Comprobantes" }, // ← AGREGAR
+    { id: "comprobantes", icon: FileText, label: "Comprobantes" },
   ];
 
   return (
@@ -106,13 +117,13 @@ function AdminContent() {
         </nav>
 
         <div className="p-4 border-t border-stone-800">
-          <Link
-            href="/login"
+          <button
+            onClick={() => setShowConfirmModal(true)}
             className="flex items-center justify-center gap-2 w-full px-4 py-3 text-sm text-stone-400 hover:text-white uppercase tracking-widest transition-colors"
           >
             <LogOut className="w-4 h-4" />
             Cerrar Sesión
-          </Link>
+          </button>
         </div>
       </aside>
 
@@ -156,13 +167,13 @@ function AdminContent() {
               ))}
             </nav>
             <div className="p-4 border-t border-stone-800">
-              <Link
-                href="/login"
+              <button
+                onClick={() => setShowConfirmModal(true)}
                 className="flex items-center justify-center gap-2 w-full px-4 py-3 text-sm text-stone-400 hover:text-white uppercase tracking-widest transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 Cerrar Sesión
-              </Link>
+              </button>
             </div>
           </aside>
         </div>
@@ -192,6 +203,16 @@ function AdminContent() {
           </AnimatePresence>
         </div>
       </main>
+
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleLogout}
+        title="Cerrar Sesión"
+        message="¿Estás seguro de que deseas cerrar sesión?"
+        confirmText="Sí, cerrar sesión"
+        cancelText="Cancelar"
+      />
     </div>
   );
 }
@@ -199,8 +220,10 @@ function AdminContent() {
 export default function AdminPage() {
   return (
     <EventProvider>
-      <MesaProvider> {/* ← AGREGAR */}
-        <AdminContent />
+      <MesaProvider>
+        <UserProvider>
+          <AdminContent />
+        </UserProvider>
       </MesaProvider>
     </EventProvider>
   );

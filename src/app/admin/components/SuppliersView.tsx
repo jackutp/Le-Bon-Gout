@@ -2,7 +2,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, FileText, Upload, X, CheckCircle, Download, Trash, Plus, Edit } from "lucide-react";
+import { Send, FileText, Upload, X, CheckCircle, Download, Trash, Plus, Edit, RefreshCw } from "lucide-react";
 import { useProveedores } from "@/context/ProveedorContext";
 export function SuppliersView() {
     const {
@@ -237,28 +237,39 @@ export function SuppliersView() {
         }
     };
 
-    if (loading) {
+    if (loading && proveedores.length === 0) {
         return <div className="text-center py-12 text-stone-400">Cargando proveedores...</div>;
     }
 
     return (
         <div className="space-y-6">
             {/* Botones de acción */}
-            <div className="flex justify-end gap-4">
-                <button
-                    onClick={openCreateProveedor}
-                    className="flex items-center gap-2 bg-green-600/20 text-green-500 border border-green-500/50 px-4 py-2 rounded text-sm uppercase tracking-widest hover:bg-green-600/30 transition-colors"
-                >
-                    <Plus className="w-4 h-4" />
-                    Nuevo Proveedor
-                </button>
-                <button
-                    onClick={() => setShowRequestModal(true)}
-                    className="flex items-center gap-2 bg-[#C6A96B] text-black px-4 py-2 rounded text-sm uppercase tracking-widest hover:bg-white transition-colors"
-                >
-                    <Send className="w-4 h-4" />
-                    Solicitar Pedido
-                </button>
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-serif text-white">Proveedores</h2>
+                <div className="flex gap-4">
+                    <button
+                        onClick={() => refreshOrdenes()}
+                        disabled={loading}
+                        className="text-stone-400 hover:text-[#C6A96B] transition-colors p-2 rounded border border-stone-700 hover:border-[#C6A96B] disabled:opacity-50"
+                        aria-label="Refrescar datos"
+                    >
+                        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                    </button>
+                    <button
+                        onClick={openCreateProveedor}
+                        className="flex items-center gap-2 bg-green-600/20 text-green-500 border border-green-500/50 px-4 py-2 rounded text-sm uppercase tracking-widest hover:bg-green-600/30 transition-colors"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Nuevo Proveedor
+                    </button>
+                    <button
+                        onClick={() => setShowRequestModal(true)}
+                        className="flex items-center gap-2 bg-[#C6A96B] text-black px-4 py-2 rounded text-sm uppercase tracking-widest hover:bg-white transition-colors"
+                    >
+                        <Send className="w-4 h-4" />
+                        Solicitar Pedido
+                    </button>
+                </div>
             </div>
 
             <div className="bg-[#121214] border border-stone-800 rounded p-6">

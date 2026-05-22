@@ -4,19 +4,28 @@ import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 import { useCocina } from "@/context/CocinaContext";
+import { useAuth } from "@/context/AuthContext";
 import { HeaderCocina } from "./components/HeaderCocina";
 import { TarjetaOrdenCocina } from "./components/TarjetaOrdenCocina";
 import { ModalHistorial } from "./components/ModalHistorial";
 import { ModalDetallePedido } from "./components/ModalDetallePedido";
 import { Order, PedidoCocinaFront } from "./types";
+import { ConfirmModal } from "@/components/ConfirmModal";
 
 export default function CocinaPage() {
-  const chefName = "Chef Isabelle";
   const { pedidos, historial, isLoading, marcarItemCompletado, marcarPedidoServido, fetchPedidos, fetchHistorial } = useCocina();
+  const { user, logout } = useAuth();
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showHistorial, setShowHistorial] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  // Transformar datos del backend al formato que espera el frontend
+  const chefName = user ? `${user.nombre} ${user.apellido || ''}` : "Chef";
+
+  const handleLogout = () => {
+    logout();
+    setShowConfirmModal(false);
+  };
+
   const transformPedidos = (pedidosList: PedidoCocinaFront[]): Order[] => {
     return pedidosList.map(pedido => ({
       id: pedido.ordenId,
@@ -53,7 +62,6 @@ export default function CocinaPage() {
     setSelectedOrder(order);
   };
 
-
   const activeOrders = transformPedidos(pedidos);
   const completedOrdersCount = historial.length;
   const historialTransformado = transformPedidos(historial);
@@ -67,49 +75,62 @@ export default function CocinaPage() {
   }
 
   return (
-    <div className="bg-[#0B0B0C] min-h-screen text-stone-100 font-sans flex flex-col">
-      <HeaderCocina
-        chefName={chefName}
-        activeOrdersCount={activeOrders.length}
-        completedOrdersCount={completedOrdersCount}
-        onViewHistory={() => setShowHistorial(true)}
-      />
+    <>
+      <div className="bg-[#0B0B0C] min-h-screen text-stone-100 font-sans flex flex-col">
+        <HeaderCocina
+          chefName={chefName}
+          activeOrdersCount={activeOrders.length}
+          completedOrdersCount={completedOrdersCount}
+          onViewHistory={() => setShowHistorial(true)}
+          onLogout={() => setShowConfirmModal(true)}
+        />
 
-      <main className="flex-1 p-3 lg:p-6 overflow-x-auto">
-        <div className="flex gap-3 lg:gap-6 h-full items-start">
-          <AnimatePresence>
-            {activeOrders.length === 0 ? (
-              <div className="w-full h-full flex flex-col items-center justify-center text-stone-500">
-                <CheckCircle className="w-12 lg:w-16 mb-4 text-stone-800" />
-                <p className="text-lg lg:text-xl font-serif">No hay comandas</p>
-                <p className="text-sm">Buen trabajo, Chef.</p>
-              </div>
-            ) : (
-              activeOrders.map((order) => (
-                <TarjetaOrdenCocina
-                  key={order.id}
-                  order={order}
-                  toggleItemCompletion={handleToggleItem}
-                  markOrderServed={handleMarkOrderServed}
-                  onViewDetails={handleViewDetails}
-                />
-              ))
-            )}
-          </AnimatePresence>
-        </div>
-      </main>
+        <main className="flex-1 p-3 lg:p-6 overflow-x-auto">
+          <div className="flex gap-3 lg:gap-6 h-full items-start">
+            <AnimatePresence>
+              {activeOrders.length === 0 ? (
+                <div className="w-full h-full flex flex-col items-center justify-center text-stone-500">
+                  <CheckCircle className="w-12 lg:w-16 mb-4 text-stone-800" />
+                  <p className="text-lg lg:text-xl font-serif">No hay comandas</p>
+                  <p className="text-sm">Buen trabajo, Chef.</p>
+                </div>
+              ) : (
+                activeOrders.map((order) => (
+                  <TarjetaOrdenCocina
+                    key={order.id}
+                    order={order}
+                    toggleItemCompletion={handleToggleItem}
+                    markOrderServed={handleMarkOrderServed}
+                    onViewDetails={handleViewDetails}
+                  />
+                ))
+              )}
+            </AnimatePresence>
+          </div>
+        </main>
 
-      <ModalHistorial
-        isOpen={showHistorial}
-        onClose={() => setShowHistorial(false)}
-        pedidosServidos={historialTransformado}
-      />
+        <ModalHistorial
+          isOpen={showHistorial}
+          onClose={() => setShowHistorial(false)}
+          pedidosServidos={historialTransformado}
+        />
 
-      <ModalDetallePedido
-        isOpen={selectedOrder !== null}
-        onClose={() => setSelectedOrder(null)}
-        order={selectedOrder}
+        <ModalDetallePedido
+          isOpen={selectedOrder !== null}
+          onClose={() => setSelectedOrder(null)}
+          order={selectedOrder}
+        />
+      </div>
+
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleLogout}
+        title="Cerrar Sesión"
+        message="¿Estás seguro de que deseas cerrar sesión?"
+        confirmText="Sí, cerrar sesión"
+        cancelText="Cancelar"
       />
-    </div>
+    </>
   );
 }

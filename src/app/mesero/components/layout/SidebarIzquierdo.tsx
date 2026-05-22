@@ -1,14 +1,19 @@
 // src/app/mesero/components/layout/SidebarIzquierdo.tsx
+
 import { LogOut, Package, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { ViewType } from "../../types";
+
 interface Props {
   currentView: ViewType;
   setCurrentView: (v: ViewType) => void;
+  onLogout?: () => void;
 }
+
 export function SidebarIzquierdo({
   currentView,
   setCurrentView,
+  onLogout,
 }: Props) {
   return (
     <div className="col-span-2 bg-[#121214] border-r border-stone-800 flex flex-col h-screen sticky top-0 overflow-y-auto">
@@ -42,13 +47,13 @@ export function SidebarIzquierdo({
       </nav>
 
       <div className="p-3 border-t border-stone-800">
-        <Link
-          href="/login"
+        <button
+          onClick={onLogout}
           className="flex items-center justify-center gap-2 w-full px-3 py-2 text-xs text-stone-400 hover:text-white uppercase tracking-widest transition-colors"
         >
           <LogOut className="w-3 h-3" />
           Cerrar Sesion
-        </Link>
+        </button>
       </div>
     </div>
   );

@@ -13,6 +13,8 @@ import { CocinaProvider } from "@/context/CocinaContext";
 import { PagoProvider } from "@/context/PagoContext"; // ← AGREGAR
 import { ComprobanteProvider } from "@/context/ComprobanteContext";
 import { MetricasProvider } from "@/context/MetricasContext";
+import { AuthProvider } from "@/context/AuthContext";
+import { UserProvider } from "@/context/UserContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,7 +50,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       <MesaProvider>
                         <ComprobanteProvider>
                           <MetricasProvider>
-                            {children}
+                            <AuthProvider>
+                              <UserProvider>
+                                {children}
+                              </UserProvider>
+                            </AuthProvider>
                           </MetricasProvider>
                         </ComprobanteProvider>
                       </MesaProvider>

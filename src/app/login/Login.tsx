@@ -1,34 +1,26 @@
 "use client";
-
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 export interface LoginFormData {
     email: string;
     clave: string;
 }
 
-type Credentials = Record<string, string>;
-
 export default function Login() {
     const router = useRouter();
+    const { login, isLoading, error: authError } = useAuth();
     const [formData, setFormData] = useState<LoginFormData>({ email: "", clave: "" });
-    const [isRecovering, setIsRecovering] = useState(false);
     const [error, setError] = useState("");
-
-    const credentials: Credentials = {
-        "cliente@res.com": "c12345",
-        "mesero@res.com": "m12345",
-        "chef@res.com": "c12345",
-        "admin@res.com": "a12345",
-    };
+    const [isRecovering, setIsRecovering] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
 
@@ -37,42 +29,38 @@ export default function Login() {
             return;
         }
 
-        const lowerEmail = formData.email.toLowerCase();
-        const validPassword = credentials[lowerEmail];
+        const success = await login({
+            email: formData.email,
+            password: formData.clave,
+        });
 
-        if (!validPassword) {
-            setError("Correo electrónico no reconocido.");
-            return;
-        }
-
-        if (formData.clave !== validPassword) {
-            setError("Contraseña incorrecta.");
-            return;
-        }
-
-        alert("Autenticación exitosa");
-
-        if (lowerEmail.includes("mesero")) {
-            router.push("/mesero");
-        } else if (lowerEmail.includes("chef")) {
-            router.push("/cocina");
-        } else if (lowerEmail.includes("admin")) {
-            router.push("/admin");
-        } else if (lowerEmail.includes("cliente")) {
-            router.push("/");
+        if (success) {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                switch (user.tipo) {
+                    case 'MESERO':
+                        router.push('/mesero');
+                        break;
+                    case 'COCINERO':
+                        router.push('/cocina');
+                        break;
+                    case 'ADMINISTRADOR':
+                        router.push('/admin');
+                        break;
+                    default:
+                        router.push('/');
+                }
+            }
         } else {
-            setError("Credenciales no reconocidas.");
+            setError(authError || "Credenciales incorrectas");
         }
     };
 
     const handleRecover = (e: React.FormEvent) => {
         e.preventDefault();
-        setError("");
-        if (!formData.email) {
-            setError("Por favor, ingresa tu correo electrónico para enviarte las instrucciones.");
-            return;
-        }
-        alert(`Instrucciones de recuperación enviadas a ${formData.email}`);
+        // Lógica de recuperación aquí
+        alert("Funcionalidad de recuperación pendiente");
         setIsRecovering(false);
     };
 
@@ -140,9 +128,10 @@ export default function Login() {
 
                     <button
                         type="submit"
-                        className="w-full bg-[#C6A96B] text-black font-medium uppercase tracking-widest text-sm py-3 rounded hover:bg-white transition-colors mt-4"
+                        disabled={isLoading}
+                        className="w-full bg-[#C6A96B] text-black font-medium uppercase tracking-widest text-sm py-3 rounded hover:bg-white transition-colors mt-4 disabled:opacity-50"
                     >
-                        Iniciar sesión
+                        {isLoading ? "Cargando..." : "Iniciar sesión"}
                     </button>
                 </form>
             ) : (

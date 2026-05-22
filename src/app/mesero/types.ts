@@ -18,5 +18,4 @@ export interface TableData {
   status: "DISPONIBLE" | "OCUPADO" | "RESERVADO";
   total: number;
   capacity: number;
-  // img: string; // ELIMINADO
 }

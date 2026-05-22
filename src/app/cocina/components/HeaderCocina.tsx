@@ -8,7 +8,7 @@ interface Props {
   activeOrdersCount: number;
   completedOrdersCount?: number;
   onViewHistory?: () => void;
-  // ❌ Eliminar onClearHistory
+  onLogout?: () => void;
 }
 
 export function HeaderCocina({
@@ -16,7 +16,7 @@ export function HeaderCocina({
   activeOrdersCount,
   completedOrdersCount = 0,
   onViewHistory,
-  // ❌ Eliminar onClearHistory
+  onLogout
 }: Props) {
   return (
     <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 lg:p-6 border-b border-stone-800 bg-[#121214] shadow-md z-10 gap-4">
@@ -41,10 +41,13 @@ export function HeaderCocina({
         <span className="bg-[#C6A96B]/20 px-3 py-1 rounded-full text-[#C6A96B] text-xs sm:text-sm">
           {activeOrdersCount} Comandas
         </span>
-        <Link href="/login" className="flex items-center gap-2 hover:text-white transition-colors p-2">
+        <button
+          onClick={onLogout}
+          className="flex items-center gap-2 hover:text-white transition-colors p-2"
+        >
           <LogOut className="w-5 h-5" />
           <span className="hidden lg:inline">Salir</span>
-        </Link>
+        </button>
       </div>
     </header>
   );

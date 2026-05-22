@@ -1,7 +1,8 @@
 "use client";
-
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export interface RegistroFormData {
     nombre: string;
@@ -12,6 +13,8 @@ export interface RegistroFormData {
 }
 
 export default function Registro() {
+    const router = useRouter();
+    const { registro, isLoading, error: authError } = useAuth();
     const [formData, setFormData] = useState<RegistroFormData>({
         nombre: "",
         apellido: "",
@@ -26,7 +29,7 @@ export default function Registro() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
         setSuccess("");
@@ -41,6 +44,22 @@ export default function Registro() {
             return;
         }
 
+        const successReg = await registro({
+            nombre: formData.nombre,
+            apellido: formData.apellido,
+            dni: formData.dni,
+            email: formData.email,
+            clave: formData.clave,
+        });
+
+        if (successReg) {
+            setSuccess("Registro exitoso. Redirigiendo...");
+            setTimeout(() => {
+                router.push('/');
+            }, 2000);
+        } else {
+            setError(authError || "Error al registrarse. El email o DNI ya existe.");
+        }
     };
 
     return (
@@ -139,9 +158,10 @@ export default function Registro() {
 
                 <button
                     type="submit"
-                    className="w-full bg-[#C6A96B] text-black font-medium uppercase tracking-widest text-sm py-3 rounded hover:bg-white transition-colors mt-4"
+                    disabled={isLoading}
+                    className="w-full bg-[#C6A96B] text-black font-medium uppercase tracking-widest text-sm py-3 rounded hover:bg-white transition-colors mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    Registrarse
+                    {isLoading ? "Registrando..." : "Registrarse"}
                 </button>
             </form>
         </motion.div>
