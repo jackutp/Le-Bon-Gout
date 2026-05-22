@@ -36,7 +36,6 @@ export function TarjetaProducto({ product, addToOrder }: Props) {
         } rounded overflow-hidden flex flex-col`}
     >
       <div className="relative h-32 w-full bg-stone-900 overflow-hidden">
-        {/* Usar img normal en lugar de Next.js Image */}
         <img
           src={imageUrl}
           alt={product.name}

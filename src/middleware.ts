@@ -96,7 +96,6 @@ export const config = {
         '/admin/:path*',
         '/mesero/:path*',
         '/cocina/:path*',
-        '/reservas/:path*',
         '/perfil/:path*',
     ],
 };

@@ -1,4 +1,5 @@
 // src/app/mesero/page.tsx
+
 "use client";
 import { useState } from "react";
 import { usePedidos } from "@/context/PedidoContext";
@@ -11,6 +12,7 @@ import { SidebarIzquierdo } from "./components/layout/SidebarIzquierdo";
 import { SidebarDerecho } from "./components/layout/SidebarDerecho";
 import { CatalogoProductos } from "./components/productos/CatalogoProductos";
 import { EstadosMesa } from "./components/mesas/EstadosMesa";
+import { ReservasView } from "./components/reservas/ReservasView";
 import { ResumenOrden } from "./components/orden/ResumenOrden";
 import { ModalConfirmacion } from "./components/modales/ModalConfirmacion";
 import { ModalInvoice } from "./components/modales/ModalInvoice";
@@ -174,19 +176,21 @@ export default function MeseroPage() {
             <header className="flex justify-between items-center p-4 border-b border-stone-800 bg-[#121214]/80 backdrop-blur">
               <div>
                 <h1 className="text-lg font-serif text-[#C6A96B]">
-                  {currentView === "productos" ? "Catalogo de Productos" : "Estados de Mesa"}
+                  {currentView === "productos" ? "Catalogo de Productos" :
+                    currentView === "estados" ? "Estados de Mesa" : "Reservas"}
                 </h1>
                 <p className="text-xs text-stone-400">Bienvenido, {waiterName}</p>
               </div>
               <div className="flex items-center gap-3">
-                {/* Botón de refrescar para ambas vistas */}
+                {/* Botón de refrescar */}
                 <button
                   onClick={() => {
                     if (currentView === "productos") {
                       refreshProducts();
-                    } else {
+                    } else if (currentView === "estados") {
                       refreshMesas();
                     }
+                    // Para reservas, el refresco se maneja dentro del componente
                   }}
                   className="text-stone-400 hover:text-[#C6A96B] transition-colors p-2 rounded border border-stone-700 hover:border-[#C6A96B]"
                   aria-label="Refrescar datos"
@@ -204,8 +208,12 @@ export default function MeseroPage() {
             <main className="flex-1 overflow-y-auto p-4">
               {currentView === "productos" ? (
                 <CatalogoProductos addToOrder={addToOrder} />
+              ) : currentView === "estados" ? (
+                <div className="space-y-8">
+                  <EstadosMesa setInvoiceModal={setInvoiceModal} />
+                </div>
               ) : (
-                <EstadosMesa setInvoiceModal={setInvoiceModal} />
+                <ReservasView />
               )}
             </main>
           </div>

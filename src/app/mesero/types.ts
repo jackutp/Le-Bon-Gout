@@ -1,6 +1,7 @@
 // src/app/mesero/types.ts
 
-export type ViewType = "productos" | "estados";
+export type ViewType = "productos" | "estados" | "reservas";
+
 export interface OrderItemState {
   id: number;
   qty: number;
@@ -11,7 +12,6 @@ export interface InvoiceData {
   total: number;
 }
 
-// Nuevo tipo alineado con microservicio-mesas
 export interface TableData {
   id: number;
   number: number;

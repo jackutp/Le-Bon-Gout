@@ -1,6 +1,6 @@
 // src/app/mesero/components/layout/SidebarIzquierdo.tsx
 
-import { LogOut, Package, LayoutGrid } from "lucide-react";
+import { LogOut, Package, LayoutGrid, Calendar } from "lucide-react";
 import Link from "next/link";
 import { ViewType } from "../../types";
 
@@ -43,6 +43,18 @@ export function SidebarIzquierdo({
         >
           <LayoutGrid className="w-4 h-4" />
           <span className="text-xs">Estados de Mesa</span>
+        </button>
+
+        {/* ← NUEVO BOTÓN: Reservas */}
+        <button
+          onClick={() => setCurrentView("reservas")}
+          className={`w-full flex items-center gap-2 px-3 py-2.5 rounded text-sm uppercase tracking-widest transition-colors ${currentView === "reservas"
+            ? "bg-[#C6A96B]/10 text-[#C6A96B] border border-[#C6A96B]/30"
+            : "text-stone-400 hover:text-white hover:bg-stone-900 border border-transparent"
+            }`}
+        >
+          <Calendar className="w-4 h-4" />
+          <span className="text-xs">Reservas</span>
         </button>
       </nav>
 
