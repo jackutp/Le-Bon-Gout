@@ -1,4 +1,5 @@
 // src/app/layout.tsx
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
@@ -8,6 +9,11 @@ import { InsumoProvider } from "@/context/InsumoContext";
 import { MermaProvider } from "@/context/MermaContext";
 import { ProveedorProvider } from "@/context/ProveedorContext";
 import { MesaProvider } from "@/context/MesaContext";
+import { CocinaProvider } from "@/context/CocinaContext";
+import { PagoProvider } from "@/context/PagoContext"; // ← AGREGAR
+import { ComprobanteProvider } from "@/context/ComprobanteContext";
+import { MetricasProvider } from "@/context/MetricasContext";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -32,19 +38,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <body>
-        <PedidoProvider>
-          <ProductoProvider>
-            <InsumoProvider>
-              <MermaProvider>
-                <ProveedorProvider>
-                  <MesaProvider>
-                    {children}
-                  </MesaProvider>
-                </ProveedorProvider>
-              </MermaProvider>
-            </InsumoProvider>
-          </ProductoProvider>
-        </PedidoProvider>
+        <PagoProvider>  {/* ← AGREGAR */}
+          <CocinaProvider>
+            <PedidoProvider>
+              <ProductoProvider>
+                <InsumoProvider>
+                  <MermaProvider>
+                    <ProveedorProvider>
+                      <MesaProvider>
+                        <ComprobanteProvider>
+                          <MetricasProvider>
+                            {children}
+                          </MetricasProvider>
+                        </ComprobanteProvider>
+                      </MesaProvider>
+                    </ProveedorProvider>
+                  </MermaProvider>
+                </InsumoProvider>
+              </ProductoProvider>
+            </PedidoProvider>
+          </CocinaProvider>
+        </PagoProvider>
       </body>
     </html>
   );

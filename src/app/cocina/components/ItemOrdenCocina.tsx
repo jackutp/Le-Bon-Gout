@@ -1,4 +1,5 @@
-//src/app/cocina/components/ItemOrdenCocina.tsx
+// src/app/cocina/components/ItemOrdenCocina.tsx
+
 import { CheckCircle } from "lucide-react";
 import { OrderItem } from "../types";
 
@@ -13,8 +14,8 @@ export function ItemOrdenCocina({ item, orderId, toggleItemCompletion }: Props) 
     <div
       onClick={() => toggleItemCompletion(orderId, item.id)}
       className={`flex items-start gap-2 lg:gap-4 p-2 lg:p-3 rounded cursor-pointer transition-all border ${item.completed
-        ? "bg-[#C6A96B]/10 border-[#C6A96B]/30 opacity-60"
-        : "bg-[#0B0B0C] border-stone-800 hover:border-stone-600"
+          ? "bg-[#C6A96B]/10 border-[#C6A96B]/30 opacity-60"
+          : "bg-[#0B0B0C] border-stone-800 hover:border-stone-600"
         }`}
     >
       <div

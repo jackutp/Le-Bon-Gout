@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, LayoutDashboard, Package, Users, BookOpen, Calendar, Truck, AlertTriangle, X, PartyPopper, TableIcon } from "lucide-react";
+import { LogOut, LayoutDashboard, Package, Users, BookOpen, Calendar, Truck, AlertTriangle, X, PartyPopper, TableIcon, FileText } from "lucide-react";
 import Link from "next/link";
 
 // Componentes
@@ -16,6 +16,7 @@ import { SuppliersView } from "./components/SuppliersView";
 import { WasteView } from "./components/WasteView";
 import { EventsView } from "./components/EventsView";
 import { MesasView } from "./components/MesasView";
+import { ComprobantesView } from "./components/ComprobantesView";
 
 // Importar providers
 import { EventProvider } from "@/context/EventContext";
@@ -46,6 +47,8 @@ function AdminContent() {
         return <EventsView />;
       case "mesas":
         return <MesasView />;
+      case "comprobantes":
+        return <ComprobantesView />;
       default:
         return <DashboardView />;
     }
@@ -61,6 +64,7 @@ function AdminContent() {
     { id: "proveedores", icon: Truck, label: "Proveedores" },
     { id: "mermas", icon: AlertTriangle, label: "Mermas" },
     { id: "mesas", icon: TableIcon, label: "Mesas" },
+    { id: "comprobantes", icon: FileText, label: "Comprobantes" }, // ← AGREGAR
   ];
 
   return (
