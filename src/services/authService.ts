@@ -1,5 +1,5 @@
 // src/services/authService.ts
-import { API_BASE_URL } from './apiClient';
+import { apiFetch } from './apiClient';  // ✅ Cambiar importación
 
 export interface LoginRequest {
     email: string;
@@ -25,17 +25,10 @@ export interface UserResponse {
 }
 
 class AuthService {
-    private getHeaders() {
-        return {
-            'Content-Type': 'application/json',
-        };
-    }
-
     async login(data: LoginRequest): Promise<UserResponse> {
-        // ✅ Cambiar de "usuarios" a "users"
-        const response = await fetch(`${API_BASE_URL}/usuarios/login`, {
+        // ✅ Usar apiFetch - NO necesita token (skipAuth se puede omitir porque es público)
+        const response = await apiFetch('/usuarios/login', {
             method: 'POST',
-            headers: this.getHeaders(),
             body: JSON.stringify(data),
         });
 
@@ -48,10 +41,8 @@ class AuthService {
     }
 
     async registro(data: RegistroRequest): Promise<UserResponse> {
-        // ✅ Cambiar de "usuarios" a "users"
-        const response = await fetch(`${API_BASE_URL}/usuarios/registro`, {
+        const response = await apiFetch('/usuarios/registro', {
             method: 'POST',
-            headers: this.getHeaders(),
             body: JSON.stringify(data),
         });
 
