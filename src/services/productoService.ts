@@ -16,7 +16,7 @@ export interface Producto {
 export const productoService = {
 
     async create(data: Omit<Producto, 'productoid'>): Promise<Producto> {
-        const res = await apiFetch('/productos', {
+        const res = await apiFetch('/productos/crear', {
             method: 'POST',
             body: JSON.stringify(data),
         });
@@ -58,7 +58,7 @@ export const productoService = {
 
     // Crear producto CON imagen (siempre usa FormData)
     async createWithImage(formData: FormData): Promise<Producto> {
-        const res = await apiFetch('/productos', {
+        const res = await apiFetch('/productos/crear', {
             method: 'POST',
             body: formData,
         });

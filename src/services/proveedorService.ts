@@ -41,7 +41,7 @@ export const proveedorService = {
     },
 
     async createProveedor(proveedor: Omit<Proveedor, 'proveedorid'>): Promise<Proveedor> {
-        const res = await apiFetch('/proveedores', {
+        const res = await apiFetch('/proveedores/crear', {
             method: 'POST',
             body: JSON.stringify(proveedor),
         });

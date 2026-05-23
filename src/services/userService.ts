@@ -29,7 +29,7 @@ export interface UpdateUserRequest {
 
 class UserService {
     async getAllUsers(): Promise<User[]> {
-        const response = await apiFetch('/usuarios');
+        const response = await apiFetch('/usuarios/all');
         if (!response.ok) {
             throw new Error('Error al cargar los usuarios');
         }

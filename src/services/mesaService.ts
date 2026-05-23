@@ -22,7 +22,7 @@ export interface UpdateMesaDTO {
 
 class MesaService {
     async getAllMesas(): Promise<Mesa[]> {
-        const response = await apiFetch('/mesas');
+        const response = await apiFetch('/mesas/all');
         if (!response.ok) {
             throw new Error('Error al cargar las mesas');
         }
@@ -38,7 +38,7 @@ class MesaService {
     }
 
     async createMesa(data: CreateMesaDTO): Promise<Mesa> {
-        const response = await apiFetch('/mesas', {
+        const response = await apiFetch('/mesas/crear', {
             method: 'POST',
             body: JSON.stringify(data),
         });

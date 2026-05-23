@@ -35,7 +35,7 @@ export interface PedidoResponse {
 
 class PedidoService {
     async crearPedido(data: CrearPedidoRequest): Promise<PedidoResponse> {
-        const response = await apiFetch('/pedidos', {
+        const response = await apiFetch('/pedidos/crear', {
             method: 'POST',
             body: JSON.stringify(data),
         });
@@ -47,7 +47,7 @@ class PedidoService {
     }
 
     async getAllPedidos(): Promise<PedidoResponse[]> {
-        const response = await apiFetch('/pedidos');
+        const response = await apiFetch('/pedidos/all');
         if (!response.ok) {
             throw new Error('Error al cargar los pedidos');
         }
