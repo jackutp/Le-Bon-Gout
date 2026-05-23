@@ -73,7 +73,7 @@ class MesaService {
 
     async updateMesaEstado(id: number, estado: string, totalActual?: number, ordenActualId?: string): Promise<Mesa> {
         const response = await apiFetch(`/mesas/${id}/estado`, {
-            method: 'PATCH',
+            method: 'PUT',
             body: JSON.stringify({ estado, totalActual, ordenActualId }),
         });
         if (!response.ok) {
@@ -84,7 +84,7 @@ class MesaService {
 
     async updateMesaTotal(id: number, total: number): Promise<Mesa> {
         const response = await apiFetch(`/mesas/${id}/total`, {
-            method: 'PATCH',
+            method: 'PUT',
             body: JSON.stringify({ total }),
         });
         if (!response.ok) {

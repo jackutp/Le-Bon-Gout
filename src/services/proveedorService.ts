@@ -29,7 +29,7 @@ export const proveedorService = {
     // ============ PROVEEDORES CRUD ============
 
     async getAllProveedores(): Promise<Proveedor[]> {
-        const res = await apiFetch('/proveedores');
+        const res = await apiFetch('/proveedores/all');
         if (!res.ok) throw new Error('Error al cargar proveedores');
         return res.json();
     },

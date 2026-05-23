@@ -92,7 +92,7 @@ class EventService {
             marketingAccepted: Boolean(eventData.marketingAccepted || false),
         };
         console.log('📝 Enviando al backend:', cleanedData);
-        return this.fetchWithError('/eventos', {
+        return this.fetchWithError('/eventos/crear', {
             method: 'POST',
             headers: { 'Accept': 'application/json' },
             body: JSON.stringify(cleanedData),
@@ -100,7 +100,7 @@ class EventService {
     }
 
     async getAllEvents(page: number = 0, size: number = 10) {
-        return this.fetchWithError(`/eventos?page=${page}&size=${size}`);
+        return this.fetchWithError(`/eventos/all?page=${page}&size=${size}`);
     }
 
     async getEventById(id: number): Promise<EventRequest> {

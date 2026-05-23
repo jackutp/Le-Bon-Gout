@@ -31,7 +31,7 @@ export interface Insumo {
 export const mermaService = {
     // Obtener todas las mermas
     async getAll(): Promise<Merma[]> {
-        const res = await apiFetch('/mermas');
+        const res = await apiFetch('/mermas/all');
         if (!res.ok) throw new Error('Error al cargar mermas');
         return res.json();
     },
@@ -66,7 +66,7 @@ export const mermaService = {
 
     // Crear nueva merma
     async create(merma: Omit<Merma, 'mermaid'>): Promise<Merma> {
-        const res = await apiFetch('/mermas', {
+        const res = await apiFetch('/mermas/crear', {
             method: 'POST',
             body: JSON.stringify(merma),
         });
