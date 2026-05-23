@@ -1,4 +1,5 @@
 // src/services/authService.ts
+import { API_BASE_URL } from './apiClient';
 
 export interface LoginRequest {
     email: string;
@@ -23,8 +24,6 @@ export interface UserResponse {
     token: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090/api';
-
 class AuthService {
     private getHeaders() {
         return {
@@ -34,7 +33,7 @@ class AuthService {
 
     async login(data: LoginRequest): Promise<UserResponse> {
         // ✅ Cambiar de "usuarios" a "users"
-        const response = await fetch(`${API_BASE_URL}/users/login`, {
+        const response = await fetch(`${API_BASE_URL}/usuarios/login`, {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify(data),
@@ -50,7 +49,7 @@ class AuthService {
 
     async registro(data: RegistroRequest): Promise<UserResponse> {
         // ✅ Cambiar de "usuarios" a "users"
-        const response = await fetch(`${API_BASE_URL}/users/registro`, {
+        const response = await fetch(`${API_BASE_URL}/usuarios/registro`, {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify(data),

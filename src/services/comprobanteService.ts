@@ -1,4 +1,5 @@
 // src/services/comprobanteService.ts
+import { apiFetch, API_BASE_URL } from './apiClient';
 
 export interface Comprobante {
     id: number;
@@ -15,20 +16,9 @@ export interface Comprobante {
     createdAt: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090/api';
-
 class ComprobanteService {
-    private getHeaders() {
-        return {
-            'Content-Type': 'application/json',
-        };
-    }
-
     async listarComprobantes(): Promise<Comprobante[]> {
-        const response = await fetch(`${API_BASE_URL}/pagos/comprobantes`, {
-            method: 'GET',
-            headers: this.getHeaders(),
-        });
+        const response = await apiFetch('/pagos/comprobantes');
 
         if (!response.ok) {
             throw new Error('Error al cargar los comprobantes');

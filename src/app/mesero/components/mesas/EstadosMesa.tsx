@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function EstadosMesa({ setInvoiceModal }: Props) {
-  const { mesas, isLoading } = useMesa();  // Ya no necesitamos refreshMesas aquí
+  const { mesas, isLoading } = useMesa();
 
   const tables = mesas.map(mesa => ({
     id: mesa.id,

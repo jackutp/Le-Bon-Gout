@@ -1,4 +1,7 @@
 // src/services/productoService.ts
+import { apiFetch } from './apiClient';
+import { API_BASE_URL } from './apiClient';
+
 export interface Producto {
     productoid?: number;
     nombre: string;
@@ -10,14 +13,11 @@ export interface Producto {
     stock: number;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090/api';
-
 export const productoService = {
 
     async create(data: Omit<Producto, 'productoid'>): Promise<Producto> {
-        const res = await fetch(`${API_URL}/productos`, {
+        const res = await apiFetch('/productos', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         });
         if (!res.ok) {
@@ -27,11 +27,10 @@ export const productoService = {
         return res.json();
     },
 
-    // ✅ AGREGAR: Actualizar producto con datos JSON (sin imagen)
+    // Actualizar producto con datos JSON (sin imagen)
     async updateJson(id: number, data: Partial<Producto>): Promise<Producto> {
-        const res = await fetch(`${API_URL}/productos/${id}`, {
+        const res = await apiFetch(`/productos/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         });
         if (!res.ok) {
@@ -40,10 +39,10 @@ export const productoService = {
         }
         return res.json();
     },
+
     // Obtener todos los productos
     async getAll(): Promise<Producto[]> {
-        const url = `${API_URL}/productos`;
-        const res = await fetch(url);
+        const res = await apiFetch('/productos/all');
         if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
         const data = await res.json();
         return data.map((p: any) => ({ ...p, stock: p.stock ?? 0 }));
@@ -51,7 +50,7 @@ export const productoService = {
 
     // Obtener producto por ID
     async getById(id: number): Promise<Producto> {
-        const res = await fetch(`${API_URL}/productos/${id}`);
+        const res = await apiFetch(`/productos/${id}`);
         if (!res.ok) throw new Error('Producto no encontrado');
         const data = await res.json();
         return { ...data, stock: data.stock ?? 0 };
@@ -59,7 +58,7 @@ export const productoService = {
 
     // Crear producto CON imagen (siempre usa FormData)
     async createWithImage(formData: FormData): Promise<Producto> {
-        const res = await fetch(`${API_URL}/productos`, {
+        const res = await apiFetch('/productos', {
             method: 'POST',
             body: formData,
         });
@@ -67,9 +66,9 @@ export const productoService = {
         return res.json();
     },
 
-    // Actualizar producto (siempre usa FormData porque el backend espera multipart)
+    // Actualizar producto con imagen (multipart/FormData)
     async update(id: number, formData: FormData): Promise<Producto> {
-        const res = await fetch(`${API_URL}/productos/${id}`, {
+        const res = await apiFetch(`/productos/${id}`, {
             method: 'PUT',
             body: formData,
         });
@@ -82,9 +81,8 @@ export const productoService = {
 
     // Actualizar solo stock
     async updateStock(id: number, stock: number): Promise<Producto> {
-        const res = await fetch(`${API_URL}/productos/${id}/stock`, {
+        const res = await apiFetch(`/productos/${id}/stock`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ stock }),
         });
         if (!res.ok) throw new Error('Error al actualizar stock');
@@ -93,7 +91,7 @@ export const productoService = {
 
     // Eliminar producto
     async delete(id: number): Promise<void> {
-        const res = await fetch(`${API_URL}/productos/${id}`, {
+        const res = await apiFetch(`/productos/${id}`, {
             method: 'DELETE',
         });
         if (!res.ok) throw new Error('Error al eliminar producto');
@@ -101,7 +99,7 @@ export const productoService = {
 
     // Obtener URL de imagen
     getImageUrl(id: number, timestamp?: number): string {
-        const url = `${API_URL}/productos/${id}/imagen`;
+        const url = `${API_BASE_URL}/productos/${id}/imagen`;
         if (timestamp) {
             return `${url}?t=${timestamp}`;
         }

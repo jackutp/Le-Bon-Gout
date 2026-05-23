@@ -1,10 +1,8 @@
 // src/app/reservas/components/steps/StepConfirmation.tsx
-
 "use client";
-
 import { motion } from "framer-motion";
 import { CreditCard } from "lucide-react";
-import { PersonalData, Billing, Legal } from "../../types";
+import { PersonalData, Billing, Legal } from "../../hooks/useReserva";
 
 interface Props {
     personalData: PersonalData;
@@ -100,8 +98,8 @@ export function StepConfirmation({
                     <button
                         onClick={() => onUpdateBilling("type", "DNI")}
                         className={`px-6 py-2 rounded-full border text-sm transition-colors ${billing.type === "DNI"
-                                ? "bg-white text-black border-white"
-                                : "border-stone-800 text-stone-400"
+                            ? "bg-white text-black border-white"
+                            : "border-stone-800 text-stone-400"
                             }`}
                     >
                         Boleta (DNI)
@@ -109,8 +107,8 @@ export function StepConfirmation({
                     <button
                         onClick={() => onUpdateBilling("type", "Factura")}
                         className={`px-6 py-2 rounded-full border text-sm transition-colors ${billing.type === "Factura"
-                                ? "bg-white text-black border-white"
-                                : "border-stone-800 text-stone-400"
+                            ? "bg-white text-black border-white"
+                            : "border-stone-800 text-stone-400"
                             }`}
                     >
                         Factura (RUC)

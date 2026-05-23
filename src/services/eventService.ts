@@ -1,5 +1,5 @@
 // src/services/eventService.ts
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090/api';
+import { apiFetch } from './apiClient';
 
 export type EventStatus = "PENDIENTE" | "RECIBIDO" | "CANCELADO";
 
@@ -32,7 +32,6 @@ export interface CreateEventDTO {
     marketingAccepted?: boolean;
 }
 
-// ✅ AGREGADO: Tipo UpdateStatusDTO
 export interface UpdateStatusDTO {
     status: EventStatus;
     reason?: string;
@@ -45,33 +44,23 @@ class EventService {
             if (options?.body) {
                 console.log('📦 Datos enviados:', JSON.parse(options.body as string));
             }
-
-            const response = await fetch(url, options);
-
+            const response = await apiFetch(url, options);
             console.log(`📥 Respuesta:`, response.status, response.statusText);
-
             if (!response.ok) {
                 let errorMessage = `Error ${response.status}: ${response.statusText}`;
-                let errorDetails = null;
-
                 try {
                     const errorData = await response.json();
                     console.error('❌ Error detallado del backend:', errorData);
-
                     if (errorData.errors) {
-                        const validationErrors = Object.values(errorData.errors).join(', ');
-                        errorMessage = `Errores de validación: ${validationErrors}`;
+                        errorMessage = `Errores de validación: ${Object.values(errorData.errors).join(', ')}`;
                     } else if (errorData.message) {
                         errorMessage = errorData.message;
                     }
-                    errorDetails = errorData;
                 } catch (e) {
                     console.error('No se pudo parsear error response');
                 }
-
                 throw new Error(errorMessage);
             }
-
             if (options?.method === 'DELETE') {
                 const contentType = response.headers.get('content-type');
                 if (contentType && contentType.includes('application/json')) {
@@ -79,7 +68,6 @@ class EventService {
                 }
                 return null;
             }
-
             const data = await response.json();
             console.log('✅ Respuesta exitosa:', data);
             return data;
@@ -101,63 +89,54 @@ class EventService {
             comments: eventData.comments.trim(),
             ageConfirmed: Boolean(eventData.ageConfirmed),
             privacyAccepted: Boolean(eventData.privacyAccepted),
-            marketingAccepted: Boolean(eventData.marketingAccepted || false)
+            marketingAccepted: Boolean(eventData.marketingAccepted || false),
         };
-
         console.log('📝 Enviando al backend:', cleanedData);
-
-        return this.fetchWithError(`${API_URL}/eventos`, {
+        return this.fetchWithError('/eventos', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
+            headers: { 'Accept': 'application/json' },
             body: JSON.stringify(cleanedData),
         });
     }
 
     async getAllEvents(page: number = 0, size: number = 10) {
-        return this.fetchWithError(`${API_URL}/eventos?page=${page}&size=${size}`);
+        return this.fetchWithError(`/eventos?page=${page}&size=${size}`);
     }
 
     async getEventById(id: number): Promise<EventRequest> {
-        return this.fetchWithError(`${API_URL}/eventos/${id}`);
+        return this.fetchWithError(`/eventos/${id}`);
     }
 
     async updateEventStatus(id: number, statusData: UpdateStatusDTO): Promise<EventRequest> {
-        return this.fetchWithError(`${API_URL}/eventos/${id}/status`, {
+        return this.fetchWithError(`/eventos/${id}/status`, {
             method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
             body: JSON.stringify(statusData),
         });
     }
 
     async deleteEvent(id: number): Promise<void> {
-        const response = await fetch(`${API_URL}/eventos/${id}`, {
+        const response = await apiFetch(`/eventos/${id}`, {
             method: 'DELETE',
         });
-
         if (!response.ok) {
             throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
     }
 
     async getEventsByStatus(status: EventStatus, page: number = 0, size: number = 10) {
-        return this.fetchWithError(`${API_URL}/eventos/status/${status}?page=${page}&size=${size}`);
+        return this.fetchWithError(`/eventos/status/${status}?page=${page}&size=${size}`);
     }
 
     async getStats(): Promise<{ PENDIENTE: number; RECIBIDO: number; CANCELADO: number }> {
-        return this.fetchWithError(`${API_URL}/eventos/stats`);
+        return this.fetchWithError('/eventos/stats');
     }
 
     async searchByEmail(email: string): Promise<EventRequest[]> {
-        return this.fetchWithError(`${API_URL}/eventos/search?email=${encodeURIComponent(email)}`);
+        return this.fetchWithError(`/eventos/search?email=${encodeURIComponent(email)}`);
     }
 
     async checkAvailability(date: string): Promise<{ available: boolean; date: string }> {
-        return this.fetchWithError(`${API_URL}/eventos/check-availability?date=${date}`);
+        return this.fetchWithError(`/eventos/check-availability?date=${date}`);
     }
 }
 

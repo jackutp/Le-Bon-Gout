@@ -1,4 +1,5 @@
 // src/services/proveedorService.ts
+import { apiFetch } from './apiClient';
 
 export interface Proveedor {
     proveedorid?: number;
@@ -24,28 +25,24 @@ export interface OrdenCompra {
     updatedAt?: string;
 }
 
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090/api';
-
 export const proveedorService = {
     // ============ PROVEEDORES CRUD ============
 
     async getAllProveedores(): Promise<Proveedor[]> {
-        const res = await fetch(`${API_URL}/proveedores`);
+        const res = await apiFetch('/proveedores');
         if (!res.ok) throw new Error('Error al cargar proveedores');
         return res.json();
     },
 
     async getProveedorById(id: number): Promise<Proveedor> {
-        const res = await fetch(`${API_URL}/proveedores/${id}`);
+        const res = await apiFetch(`/proveedores/${id}`);
         if (!res.ok) throw new Error('Proveedor no encontrado');
         return res.json();
     },
 
     async createProveedor(proveedor: Omit<Proveedor, 'proveedorid'>): Promise<Proveedor> {
-        const res = await fetch(`${API_URL}/proveedores`, {
+        const res = await apiFetch('/proveedores', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(proveedor),
         });
         if (!res.ok) throw new Error('Error al crear proveedor');
@@ -53,34 +50,22 @@ export const proveedorService = {
     },
 
     async updateProveedor(id: number, proveedor: Partial<Proveedor>): Promise<Proveedor> {
-        const res = await fetch(`${API_URL}/proveedores/${id}`, {
+        const res = await apiFetch(`/proveedores/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(proveedor),
         });
         if (!res.ok) throw new Error('Error al actualizar proveedor');
         return res.json();
     },
 
-    //Antes
-    /*
-    async deleteProveedor(id: number): Promise<void> {
-        const res = await fetch(`${API_URL}/proveedores/${id}`, {
-            method: 'DELETE',
-        });
-        if (!res.ok) throw new Error('Error al eliminar proveedor');
-    },
-    */
-    //Ahora
     async deleteProveedor(id: number): Promise<{ success: boolean; message?: string; hasOrdenes?: boolean; ordenesCount?: number }> {
-        const res = await fetch(`${API_URL}/proveedores/${id}`, {
+        const res = await apiFetch(`/proveedores/${id}`, {
             method: 'DELETE',
         });
 
         const data = await res.json();
 
         if (!res.ok) {
-            // Lanzar error con la información del backend
             const error = new Error(data.error || 'Error al eliminar proveedor');
             (error as any).hasOrdenes = data.hasOrdenes;
             (error as any).ordenesCount = data.ordenesCount;
@@ -93,19 +78,19 @@ export const proveedorService = {
     // ============ ÓRDENES DE COMPRA ============
 
     async getAllOrdenes(): Promise<OrdenCompra[]> {
-        const res = await fetch(`${API_URL}/proveedores/ordenes`);
+        const res = await apiFetch('/proveedores/ordenes');
         if (!res.ok) throw new Error('Error al cargar órdenes');
         return res.json();
     },
 
     async getOrdenesByProveedor(proveedorId: number): Promise<OrdenCompra[]> {
-        const res = await fetch(`${API_URL}/proveedores/${proveedorId}/ordenes`);
+        const res = await apiFetch(`/proveedores/${proveedorId}/ordenes`);
         if (!res.ok) throw new Error('Error al cargar órdenes del proveedor');
         return res.json();
     },
 
     async getOrdenById(ordenId: number): Promise<OrdenCompra> {
-        const res = await fetch(`${API_URL}/proveedores/ordenes/${ordenId}`);
+        const res = await apiFetch(`/proveedores/ordenes/${ordenId}`);
         if (!res.ok) throw new Error('Orden no encontrada');
         return res.json();
     },
@@ -113,9 +98,8 @@ export const proveedorService = {
     async createOrden(proveedorId: number): Promise<OrdenCompra> {
         console.log('📡 [createOrden] Enviando:', { proveedorId });
 
-        const res = await fetch(`${API_URL}/proveedores/ordenes`, {
+        const res = await apiFetch('/proveedores/ordenes', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ proveedorId }),
         });
 
@@ -130,9 +114,8 @@ export const proveedorService = {
     },
 
     async updateEstadoOrden(ordenId: number, estado: string): Promise<OrdenCompra> {
-        const res = await fetch(`${API_URL}/proveedores/ordenes/${ordenId}/estado`, {
+        const res = await apiFetch(`/proveedores/ordenes/${ordenId}/estado`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ estado }),
         });
         if (!res.ok) throw new Error('Error al actualizar estado');
@@ -143,7 +126,7 @@ export const proveedorService = {
         const formData = new FormData();
         formData.append('factura', file);
 
-        const res = await fetch(`${API_URL}/proveedores/ordenes/${ordenId}/factura`, {
+        const res = await apiFetch(`/proveedores/ordenes/${ordenId}/factura`, {
             method: 'POST',
             body: formData,
         });
@@ -152,20 +135,20 @@ export const proveedorService = {
     },
 
     async descargarFactura(ordenId: number): Promise<Blob> {
-        const res = await fetch(`${API_URL}/proveedores/ordenes/${ordenId}/factura`);
+        const res = await apiFetch(`/proveedores/ordenes/${ordenId}/factura`);
         if (!res.ok) throw new Error('Error al descargar factura');
         return res.blob();
     },
 
     async eliminarFactura(ordenId: number): Promise<void> {
-        const res = await fetch(`${API_URL}/proveedores/ordenes/${ordenId}/factura`, {
+        const res = await apiFetch(`/proveedores/ordenes/${ordenId}/factura`, {
             method: 'DELETE',
         });
         if (!res.ok) throw new Error('Error al eliminar factura');
     },
 
     async deleteOrden(ordenId: number): Promise<void> {
-        const res = await fetch(`${API_URL}/proveedores/ordenes/${ordenId}`, {
+        const res = await apiFetch(`/proveedores/ordenes/${ordenId}`, {
             method: 'DELETE',
         });
         if (!res.ok) throw new Error('Error al eliminar orden');

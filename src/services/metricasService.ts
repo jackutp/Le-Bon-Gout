@@ -1,6 +1,5 @@
 // src/services/metricasService.ts
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090/api';
+import { apiFetch } from './apiClient';
 
 export interface ProductoTop {
     nombre: string;
@@ -36,13 +35,13 @@ export interface MetricasPagos {
 
 class MetricasService {
     async getMetricasPedidos(): Promise<MetricasPedidos> {
-        const response = await fetch(`${API_BASE_URL}/pedidos/metricas`);
+        const response = await apiFetch('/pedidos/metricas');
         if (!response.ok) throw new Error('Error al cargar métricas de pedidos');
         return response.json();
     }
 
     async getMetricasPagos(): Promise<MetricasPagos> {
-        const response = await fetch(`${API_BASE_URL}/pagos/metricas`);
+        const response = await apiFetch('/pagos/metricas');
         if (!response.ok) throw new Error('Error al cargar métricas de pagos');
         return response.json();
     }

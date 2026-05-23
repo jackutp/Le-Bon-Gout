@@ -1,4 +1,5 @@
 // src/services/pagoService.ts
+import { apiFetch } from './apiClient';
 
 export interface ProcesarPagoRequest {
     ordenId: string;
@@ -30,19 +31,10 @@ export interface ProcesarPagoResponse {
     comprobante: ComprobanteResponse;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090/api';
-
 class PagoService {
-    private getHeaders() {
-        return {
-            'Content-Type': 'application/json',
-        };
-    }
-
     async procesarPago(data: ProcesarPagoRequest): Promise<ProcesarPagoResponse> {
-        const response = await fetch(`${API_BASE_URL}/pagos/procesar`, {
+        const response = await apiFetch('/pagos/procesar', {
             method: 'POST',
-            headers: this.getHeaders(),
             body: JSON.stringify(data),
         });
 

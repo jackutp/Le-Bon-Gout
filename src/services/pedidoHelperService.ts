@@ -1,4 +1,5 @@
 // src/services/pedidoHelperService.ts
+import { apiFetch } from './apiClient';
 
 export interface PedidoInfo {
     id: number;
@@ -8,8 +9,6 @@ export interface PedidoInfo {
     total?: number;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090/api';
-
 class PedidoHelperService {
 
     async obtenerPedidoActivoPorMesa(mesaNumero: number): Promise<PedidoInfo | null> {
@@ -18,7 +17,7 @@ class PedidoHelperService {
 
         for (const estado of estados) {
             try {
-                const response = await fetch(`${API_BASE_URL}/pedidos/estado/${estado}`);
+                const response = await apiFetch(`/pedidos/estado/${estado}`);
                 if (!response.ok) continue;
 
                 const pedidos = await response.json();

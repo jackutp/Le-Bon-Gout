@@ -1,4 +1,5 @@
 // src/services/reservaService.ts
+import { apiFetch } from './apiClient';
 
 export interface CrearReservaRequest {
     nombre: string;
@@ -33,21 +34,12 @@ export interface ReservaResponse {
     updatedAt: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090/api';
-
 class ReservaService {
-    private getHeaders() {
-        const token = localStorage.getItem('token');
-        return {
-            'Content-Type': 'application/json',
-            ...(token && { 'Authorization': `Bearer ${token}` }),
-        };
-    }
-
     async crearReserva(data: CrearReservaRequest): Promise<ReservaResponse> {
-        const response = await fetch(`${API_BASE_URL}/reservas`, {
+        // Reservas a veces son públicas, pero permitimos enviar token si lo tienen o podemos usar skipAuth si no tienen sesión.
+        // Si el usuario no tiene token, apiFetch no lo enviará.
+        const response = await apiFetch('/reservas', {
             method: 'POST',
-            headers: this.getHeaders(),
             body: JSON.stringify(data),
         });
 
@@ -60,10 +52,7 @@ class ReservaService {
     }
 
     async listarReservas(): Promise<ReservaResponse[]> {
-        const response = await fetch(`${API_BASE_URL}/reservas`, {
-            method: 'GET',
-            headers: this.getHeaders(),
-        });
+        const response = await apiFetch('/reservas');
 
         if (!response.ok) {
             throw new Error('Error al cargar las reservas');
@@ -73,10 +62,7 @@ class ReservaService {
     }
 
     async listarPorEstado(estado: string): Promise<ReservaResponse[]> {
-        const response = await fetch(`${API_BASE_URL}/reservas/estado/${estado}`, {
-            method: 'GET',
-            headers: this.getHeaders(),
-        });
+        const response = await apiFetch(`/reservas/estado/${estado}`);
 
         if (!response.ok) {
             throw new Error('Error al cargar las reservas');
@@ -86,10 +72,7 @@ class ReservaService {
     }
 
     async listarReservasDelDia(): Promise<ReservaResponse[]> {
-        const response = await fetch(`${API_BASE_URL}/reservas/dia`, {
-            method: 'GET',
-            headers: this.getHeaders(),
-        });
+        const response = await apiFetch('/reservas/dia');
 
         if (!response.ok) {
             throw new Error('Error al cargar las reservas del día');
@@ -99,9 +82,8 @@ class ReservaService {
     }
 
     async actualizarEstado(id: number, estado: string): Promise<ReservaResponse> {
-        const response = await fetch(`${API_BASE_URL}/reservas/${id}/estado?estado=${estado}`, {
+        const response = await apiFetch(`/reservas/${id}/estado?estado=${estado}`, {
             method: 'PATCH',
-            headers: this.getHeaders(),
         });
 
         if (!response.ok) {

@@ -1,5 +1,4 @@
 // src/app/mesero/components/mesas/TarjetaMesa.tsx
-
 import { motion } from "framer-motion";
 import { Receipt } from "lucide-react";
 import Image from "next/image";

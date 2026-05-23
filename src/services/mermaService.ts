@@ -1,4 +1,5 @@
 // src/services/mermaService.ts
+import { apiFetch } from './apiClient';
 
 export interface Merma {
     mermaid?: number;
@@ -27,49 +28,46 @@ export interface Insumo {
     estadoInsumo?: string;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090/api';
-
 export const mermaService = {
     // Obtener todas las mermas
     async getAll(): Promise<Merma[]> {
-        const res = await fetch(`${API_URL}/mermas`);
+        const res = await apiFetch('/mermas');
         if (!res.ok) throw new Error('Error al cargar mermas');
         return res.json();
     },
 
     // Obtener merma por ID
     async getById(id: number): Promise<Merma> {
-        const res = await fetch(`${API_URL}/mermas/${id}`);
+        const res = await apiFetch(`/mermas/${id}`);
         if (!res.ok) throw new Error('Merma no encontrada');
         return res.json();
     },
 
     // Obtener mermas por tipo
     async getByTipo(tipo: "PRODUCTO" | "INSUMO"): Promise<Merma[]> {
-        const res = await fetch(`${API_URL}/mermas/tipo/${tipo}`);
+        const res = await apiFetch(`/mermas/tipo/${tipo}`);
         if (!res.ok) throw new Error('Error al filtrar mermas');
         return res.json();
     },
 
     // Obtener todos los productos (desde microservicio-producto vía gateway)
     async getProductos(): Promise<Producto[]> {
-        const res = await fetch(`${API_URL}/mermas/productos`);
+        const res = await apiFetch('/mermas/productos');
         if (!res.ok) throw new Error('Error al cargar productos');
         return res.json();
     },
 
     // Obtener todos los insumos (desde microservicio-insumos vía gateway)
     async getInsumos(): Promise<Insumo[]> {
-        const res = await fetch(`${API_URL}/mermas/insumos`);
+        const res = await apiFetch('/mermas/insumos');
         if (!res.ok) throw new Error('Error al cargar insumos');
         return res.json();
     },
 
     // Crear nueva merma
     async create(merma: Omit<Merma, 'mermaid'>): Promise<Merma> {
-        const res = await fetch(`${API_URL}/mermas`, {
+        const res = await apiFetch('/mermas', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(merma),
         });
         if (!res.ok) throw new Error('Error al crear merma');
@@ -78,9 +76,8 @@ export const mermaService = {
 
     // Actualizar merma
     async update(id: number, merma: Partial<Merma>): Promise<Merma> {
-        const res = await fetch(`${API_URL}/mermas/${id}`, {
+        const res = await apiFetch(`/mermas/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(merma),
         });
         if (!res.ok) throw new Error('Error al actualizar merma');
@@ -89,7 +86,7 @@ export const mermaService = {
 
     // Eliminar merma
     async delete(id: number): Promise<void> {
-        const res = await fetch(`${API_URL}/mermas/${id}`, {
+        const res = await apiFetch(`/mermas/${id}`, {
             method: 'DELETE',
         });
         if (!res.ok) throw new Error('Error al eliminar merma');

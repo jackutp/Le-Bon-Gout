@@ -3,7 +3,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Customizations } from "../../types";
+import { Customizations } from "../../hooks/useReserva";
 
 interface Props {
     customizations: Customizations;

@@ -8,8 +8,8 @@ const publicRoutes = ['/', '/login', '/registro'];
 // Rutas protegidas con sus roles permitidos
 const protectedRoutes: Record<string, string[]> = {
     '/admin': ['ADMINISTRADOR'],
-    '/mesero': ['MESERO'],
-    '/cocina': ['COCINERO'],
+    '/mesero': ['MESERO', 'ADMINISTRADOR'],
+    '/cocina': ['COCINERO', 'ADMINISTRADOR'],
     '/reservas': ['CLIENTE', 'ADMINISTRADOR', 'MESERO', 'COCINERO'],
     '/eventos': ['CLIENTE', 'ADMINISTRADOR', 'MESERO', 'COCINERO'],
 };
@@ -77,8 +77,8 @@ export function middleware(request: NextRequest) {
     }
 
     // Obtener el rol del usuario
-    const userRole = payload.tipo || payload.role;
-
+    const authorities: string[] = payload.authorities || [];
+    const userRole = authorities[0];
     // 6. Verificar si el rol tiene permiso
     if (!requiredRoles.includes(userRole)) {
         // No autorizado
