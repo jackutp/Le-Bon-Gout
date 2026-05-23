@@ -12,7 +12,7 @@ export interface Insumo {
 export const insumoService = {
     // Obtener todos los insumos
     async getAll(): Promise<Insumo[]> {
-        const res = await apiFetch('/insumos');
+        const res = await apiFetch('/insumos/all');
         if (!res.ok) throw new Error('Error al cargar insumos');
         const data = await res.json();
         return data.map((i: any) => ({ ...i, stock: i.stock ?? 0 }));
@@ -65,7 +65,7 @@ export const insumoService = {
         if (insumo.estadoInsumo) {
             body.estadoInsumo = insumo.estadoInsumo;
         }
-        const res = await apiFetch('/insumos', {
+        const res = await apiFetch('/insumos/crear', {
             method: 'POST',
             body: JSON.stringify(body),
         });
