@@ -1,5 +1,5 @@
 // src/services/pagoService.ts
-import { apiFetch } from './apiClient';
+import { apiFetch } from './apiClient';  // ✅ Cambiar importación
 
 export interface ProcesarPagoRequest {
     ordenId: string;
@@ -33,6 +33,7 @@ export interface ProcesarPagoResponse {
 
 class PagoService {
     async procesarPago(data: ProcesarPagoRequest): Promise<ProcesarPagoResponse> {
+        // ✅ Usar apiFetch - maneja headers y token automáticamente
         const response = await apiFetch('/pagos/procesar', {
             method: 'POST',
             body: JSON.stringify(data),

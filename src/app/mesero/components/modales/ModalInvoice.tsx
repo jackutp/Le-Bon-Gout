@@ -8,6 +8,7 @@ import { InvoiceData } from "../../types";
 import { useState } from "react";
 import { usePago } from "@/context/PagoContext";
 import { useMesa } from "@/context/MesaContext";
+import { apiFetch } from "@/services/apiClient";  // ✅ Importar apiFetch
 
 interface Props {
   isOpen: boolean;
@@ -29,22 +30,30 @@ export function ModalInvoice({ isOpen, onClose, invoiceModal, onPaymentSuccess }
 
   if (!invoiceModal) return null;
 
+  // ✅ CORREGIDO: Usar apiFetch que envía el token automáticamente
   const obtenerPedidoActivo = async (mesaNumero: number) => {
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090/api';
+    try {
+      // Buscar en PENDIENTE primero
+      const pendientesRes = await apiFetch('/pedidos/estado/PENDIENTE');
+      if (pendientesRes.ok) {
+        const pendientes = await pendientesRes.json();
+        const pedido = pendientes.find((p: any) => p.mesaNumero === mesaNumero);
+        if (pedido) return pedido;
+      }
 
-    // Buscar en PENDIENTE primero
-    const pendientesRes = await fetch(`${API_BASE_URL}/pedidos/estado/PENDIENTE`);
-    const pendientes = await pendientesRes.json();
-    let pedido = pendientes.find((p: any) => p.mesaNumero === mesaNumero);
+      // Si no hay pendiente, buscar SERVIDO
+      const servidosRes = await apiFetch('/pedidos/estado/SERVIDO');
+      if (servidosRes.ok) {
+        const servidos = await servidosRes.json();
+        const pedido = servidos.find((p: any) => p.mesaNumero === mesaNumero);
+        if (pedido) return pedido;
+      }
 
-    // Si no hay pendiente, buscar SERVIDO
-    if (!pedido) {
-      const servidosRes = await fetch(`${API_BASE_URL}/pedidos/estado/SERVIDO`);
-      const servidos = await servidosRes.json();
-      pedido = servidos.find((p: any) => p.mesaNumero === mesaNumero);
+      return null;
+    } catch (error) {
+      console.error("Error obteniendo pedido activo:", error);
+      return null;
     }
-
-    return pedido;
   };
 
   const handleProcesarPago = async () => {
