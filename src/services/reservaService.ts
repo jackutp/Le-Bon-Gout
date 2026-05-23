@@ -38,7 +38,7 @@ class ReservaService {
     async crearReserva(data: CrearReservaRequest): Promise<ReservaResponse> {
         // Reservas a veces son públicas, pero permitimos enviar token si lo tienen o podemos usar skipAuth si no tienen sesión.
         // Si el usuario no tiene token, apiFetch no lo enviará.
-        const response = await apiFetch('/reservas', {
+        const response = await apiFetch('/reservas/crear', {
             method: 'POST',
             body: JSON.stringify(data),
         });
@@ -52,7 +52,7 @@ class ReservaService {
     }
 
     async listarReservas(): Promise<ReservaResponse[]> {
-        const response = await apiFetch('/reservas');
+        const response = await apiFetch('/reservas/all');
 
         if (!response.ok) {
             throw new Error('Error al cargar las reservas');
