@@ -19,6 +19,7 @@ export interface UserResponse {
     apellido: string;
     dni: string;
     email: string;
+    telefono?: string;
     tipo: "CLIENTE" | "MESERO" | "COCINERO" | "ADMINISTRADOR";
     token: string;
 }

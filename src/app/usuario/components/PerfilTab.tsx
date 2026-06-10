@@ -3,6 +3,7 @@
 
 import { motion } from "framer-motion";
 import { User, Mail, Phone, BadgeCheck, Calendar } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -74,47 +75,56 @@ export default function PerfilTab({ perfil }: PerfilTabProps) {
                 <>
                     {/* Versión detallada para escritorio */}
                     <dl className="hidden sm:grid sm:grid-cols-2 gap-x-8 gap-y-0">
-                        {[
-                            { label: "Nombre", value: perfil.nombre },
-                            { label: "Apellido", value: perfil.apellido },
-                            { label: "Correo", value: perfil.email },
-                            { label: "Teléfono", value: perfil.telefono },
-                            { label: "Rol", value: rolLabels[perfil.rol] },
-                            {
-                                label: "Miembro desde",
-                                value: new Date(perfil.fechaRegistro).toLocaleDateString("es-PE", {
-                                    year: "numeric",
-                                    month: "long",
-                                    day: "2-digit",
-                                }),
-                            },
-                        ].map(({ label, value }) => (
-                            <div
-                                key={label}
-                                className="py-3.5 border-b border-stone-800/60 last:border-0"
-                            >
-                                <dt className="text-xs uppercase tracking-widest text-stone-500 mb-0.5">
-                                    {label}
-                                </dt>
-                                <dd className="text-sm text-white font-medium">{value}</dd>
-                            </div>
-                        ))}
+                        <div className="py-3.5 border-b border-stone-800/60">
+                            <dt className="text-xs uppercase tracking-widest text-stone-500 mb-0.5">Nombre</dt>
+                            <dd className="text-sm text-white font-medium">{perfil.nombre}</dd>
+                        </div>
+                        <div className="py-3.5 border-b border-stone-800/60">
+                            <dt className="text-xs uppercase tracking-widest text-stone-500 mb-0.5">Apellido</dt>
+                            <dd className="text-sm text-white font-medium">{perfil.apellido}</dd>
+                        </div>
+                        <div className="py-3.5 border-b border-stone-800/60">
+                            <dt className="text-xs uppercase tracking-widest text-stone-500 mb-0.5">Correo</dt>
+                            <dd className="text-sm text-white font-medium">{perfil.email}</dd>
+                        </div>
+                        <div className="py-3.5 border-b border-stone-800/60">
+                            <dt className="text-xs uppercase tracking-widest text-stone-500 mb-0.5">Teléfono</dt>
+                            <dd className="text-sm text-white font-medium">{perfil.telefono || "—"}</dd>
+                        </div>
+                        <div className="py-3.5 border-b border-stone-800/60">
+                            <dt className="text-xs uppercase tracking-widest text-stone-500 mb-0.5">Rol</dt>
+                            <dd className="text-sm text-white font-medium">{rolLabels[perfil.rol]}</dd>
+                        </div>
+                        <div className="py-3.5 border-b border-stone-800/60">
+                            <dt className="text-xs uppercase tracking-widest text-stone-500 mb-0.5">Miembro desde</dt>
+                            <dd className="text-sm text-white font-medium">
+                                {perfil.fechaRegistro
+                                    ? new Date(perfil.fechaRegistro).toLocaleDateString("es-PE", {
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "2-digit",
+                                    })
+                                    : "—"}
+                            </dd>
+                        </div>
                     </dl>
 
                     {/* Versión compacta para móvil */}
                     <div className="sm:hidden">
                         <InfoRow icon={User} label="Nombre completo" value={`${perfil.nombre} ${perfil.apellido}`} />
                         <InfoRow icon={Mail} label="Correo Electrónico" value={perfil.email} />
-                        <InfoRow icon={Phone} label="Teléfono" value={perfil.telefono} />
+                        <InfoRow icon={Phone} label="Teléfono" value={perfil.telefono || "—"} />
                         <InfoRow icon={BadgeCheck} label="Rol / Puesto" value={rolLabels[perfil.rol]} />
                         <InfoRow
                             icon={Calendar}
                             label="Miembro desde"
-                            value={new Date(perfil.fechaRegistro).toLocaleDateString("es-PE", {
-                                year: "numeric",
-                                month: "long",
-                                day: "2-digit",
-                            })}
+                            value={perfil.fechaRegistro
+                                ? new Date(perfil.fechaRegistro).toLocaleDateString("es-PE", {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "2-digit",
+                                })
+                                : "—"}
                         />
                     </div>
                 </>

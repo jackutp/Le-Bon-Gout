@@ -1,7 +1,4 @@
 // src/app/usuario/page.tsx
-// React Server Component (shell) — interactive logic delegated to UsuarioClient.
-// ⚠️  UsuarioClient uses useSearchParams(), so it MUST be wrapped in <Suspense>.
-
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import UsuarioClient from "./UsuarioClient";
@@ -29,4 +26,3 @@ export default function UsuarioPage() {
     </Suspense>
   );
 }
-

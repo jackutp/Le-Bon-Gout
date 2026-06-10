@@ -3,20 +3,13 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  User,
-  Mail,
-  Phone,
-  BadgeCheck,
-  LogOut,
-  Calendar,
-  ClipboardList,
-} from "lucide-react";
+import { User, LogOut, ClipboardList } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import PerfilTab from "./components/PerfilTab";
 import SolicitudesTab from "./components/SolicitudesTab";
+import { SolicitudProvider } from "@/context/SolicitudContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -54,30 +47,6 @@ function getInitials(nombre: string, apellido: string) {
   return `${nombre.charAt(0)}${apellido.charAt(0)}`.toUpperCase();
 }
 
-// ─── InfoRow component (solo para sidebar) ────────────────────────────────────
-
-function InfoRow({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="flex items-start gap-3 py-3.5 border-b border-stone-800/70 last:border-0">
-      <div className="mt-0.5 w-8 h-8 rounded bg-[#C6A96B]/10 flex items-center justify-center shrink-0">
-        <Icon className="w-4 h-4 text-[#C6A96B]" />
-      </div>
-      <div className="min-w-0">
-        <p className="text-xs uppercase tracking-widest text-stone-500 mb-0.5">{label}</p>
-        <p className="text-sm text-white font-medium break-words">{value}</p>
-      </div>
-    </div>
-  );
-}
-
 // ─── Tab button ───────────────────────────────────────────────────────────────
 
 function TabButton({
@@ -97,9 +66,7 @@ function TabButton({
     <button
       id={id}
       onClick={onClick}
-      className={`relative flex items-center gap-2 px-5 py-3 text-xs uppercase tracking-widest transition-colors ${active
-        ? "text-[#C6A96B]"
-        : "text-stone-500 hover:text-stone-300"
+      className={`relative flex items-center gap-2 px-5 py-3 text-xs uppercase tracking-widest transition-colors ${active ? "text-[#C6A96B]" : "text-stone-500 hover:text-stone-300"
         }`}
     >
       <Icon className="w-3.5 h-3.5" />
@@ -117,7 +84,7 @@ function TabButton({
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export default function UsuarioClient() {
+function UsuarioContent() {
   const { user, logout } = useAuth();
   const searchParams = useSearchParams();
 
@@ -131,14 +98,15 @@ export default function UsuarioClient() {
     setActiveTab(param === "solicitudes" ? "solicitudes" : "perfil");
   }, [searchParams]);
 
+  // Construir perfil desde el usuario autenticado
   const perfil: PerfilUsuario | null = user
     ? {
       idUsuario: user.idUsuario,
       nombre: user.nombre,
       apellido: user.apellido,
       email: user.email,
-      telefono: "—",
-      rol: user.tipo,
+      telefono: user.telefono || "—",
+      rol: user.tipo as Rol,
       fechaRegistro: new Date().toISOString().split("T")[0],
     }
     : null;
@@ -159,7 +127,6 @@ export default function UsuarioClient() {
               </span>
             )}
             <button
-              id="btn-header-logout"
               onClick={logout}
               title="Cerrar sesión"
               className="p-2 rounded border border-stone-800 text-stone-500 hover:text-red-400 hover:border-red-500/40 transition-colors"
@@ -182,9 +149,7 @@ export default function UsuarioClient() {
           </p>
           <h1 className="font-serif text-3xl text-white">
             Bienvenido
-            {perfil && (
-              <>, <span className="text-[#C6A96B]">{perfil.nombre}</span></>
-            )}
+            {perfil && <>, <span className="text-[#C6A96B]">{perfil.nombre}</span></>}
           </h1>
         </motion.div>
 
@@ -218,7 +183,6 @@ export default function UsuarioClient() {
                         {perfil.nombre} {perfil.apellido}
                       </p>
                       <span
-                        id="badge-rol"
                         className={`mt-1.5 inline-block px-3 py-0.5 rounded border text-xs uppercase tracking-widest ${rolColors[perfil.rol]}`}
                       >
                         {rolLabels[perfil.rol]}
@@ -226,19 +190,16 @@ export default function UsuarioClient() {
                     </div>
                   </div>
 
-                  <div>
-                    <InfoRow icon={Mail} label="Correo Electrónico" value={perfil.email} />
-                    <InfoRow icon={Phone} label="Teléfono" value={perfil.telefono} />
-                    <InfoRow icon={BadgeCheck} label="Rol / Puesto" value={rolLabels[perfil.rol]} />
-                    <InfoRow
-                      icon={Calendar}
-                      label="Miembro desde"
-                      value={new Date(perfil.fechaRegistro).toLocaleDateString("es-PE", {
-                        year: "numeric",
-                        month: "long",
-                        day: "2-digit",
-                      })}
-                    />
+                  {/* Información básica en sidebar */}
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs uppercase tracking-widest text-stone-500">Correo</p>
+                      <p className="text-sm text-white break-words">{perfil.email}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-widest text-stone-500">Teléfono</p>
+                      <p className="text-sm text-white">{perfil.telefono}</p>
+                    </div>
                   </div>
                 </>
               ) : (
@@ -250,7 +211,6 @@ export default function UsuarioClient() {
               )}
 
               <button
-                id="btn-logout-card"
                 onClick={logout}
                 className="w-full border border-stone-800 text-stone-400 py-2.5 rounded text-sm uppercase tracking-widest hover:border-red-500/40 hover:text-red-400 transition-colors flex items-center justify-center gap-2"
               >
@@ -296,5 +256,13 @@ export default function UsuarioClient() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function UsuarioClient() {
+  return (
+    <SolicitudProvider>
+      <UsuarioContent />
+    </SolicitudProvider>
   );
 }
