@@ -8,16 +8,25 @@ import { Solicitud, CrearSolicitudDTO, EstadisticasSolicitudes } from '@/types/s
 import { useAuth } from './AuthContext';
 
 interface SolicitudContextType {
+    // Estado
     solicitudes: Solicitud[];
     isLoading: boolean;
     error: string | null;
     estadisticas: EstadisticasSolicitudes | null;
+
+    // Métodos principales
     crearSolicitud: (data: CrearSolicitudDTO) => Promise<Solicitud | null>;
-    actualizarEstado: (id: number, estado: string) => Promise<Solicitud | null>;
     listarSolicitudes: () => Promise<void>;
+    obtenerSolicitud: (id: number) => Promise<Solicitud | null>;
+
+    // Métodos de actualización (solo ADMIN)
+    actualizarEstado: (id: number, estado: string) => Promise<Solicitud | null>;
+    actualizarResponsable: (id: number, responsable: string) => Promise<Solicitud | null>;
+    actualizarResolucion: (id: number, resolucion: string) => Promise<Solicitud | null>;
+
+    // Filtros
     listarPorEstado: (estado: string) => Promise<Solicitud[]>;
     listarPorTipo: (tipo: string) => Promise<Solicitud[]>;
-    obtenerSolicitud: (id: number) => Promise<Solicitud | null>;
 }
 
 const SolicitudContext = createContext<SolicitudContextType | undefined>(undefined);
@@ -29,6 +38,7 @@ export function SolicitudProvider({ children }: { children: ReactNode }) {
     const [estadisticas, setEstadisticas] = useState<EstadisticasSolicitudes | null>(null);
     const { isAuthenticated } = useAuth();
 
+    // ========== CARGAR SOLICITUDES ==========
     const listarSolicitudes = async () => {
         if (!isAuthenticated) return;
 
@@ -36,6 +46,7 @@ export function SolicitudProvider({ children }: { children: ReactNode }) {
         try {
             const data = await solicitudService.listarSolicitudes();
             setSolicitudes(data);
+            setError(null);
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -43,6 +54,7 @@ export function SolicitudProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    // ========== CARGAR ESTADÍSTICAS ==========
     const cargarEstadisticas = async () => {
         if (!isAuthenticated) return;
 
@@ -54,6 +66,7 @@ export function SolicitudProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    // ========== CREAR SOLICITUD ==========
     const crearSolicitud = async (data: CrearSolicitudDTO): Promise<Solicitud | null> => {
         setIsLoading(true);
         setError(null);
@@ -70,6 +83,17 @@ export function SolicitudProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    // ========== OBTENER SOLICITUD POR ID ==========
+    const obtenerSolicitud = async (id: number): Promise<Solicitud | null> => {
+        try {
+            return await solicitudService.obtenerSolicitud(id);
+        } catch (err: any) {
+            setError(err.message);
+            return null;
+        }
+    };
+
+    // ========== ACTUALIZAR ESTADO ==========
     const actualizarEstado = async (id: number, estado: string): Promise<Solicitud | null> => {
         setIsLoading(true);
         setError(null);
@@ -86,6 +110,39 @@ export function SolicitudProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    // ========== ACTUALIZAR RESPONSABLE ASIGNADO ==========
+    const actualizarResponsable = async (id: number, responsable: string): Promise<Solicitud | null> => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const actualizada = await solicitudService.actualizarResponsable(id, responsable);
+            await listarSolicitudes();
+            return actualizada;
+        } catch (err: any) {
+            setError(err.message);
+            return null;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // ========== ACTUALIZAR RESOLUCIÓN ==========
+    const actualizarResolucion = async (id: number, resolucion: string): Promise<Solicitud | null> => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const actualizada = await solicitudService.actualizarResolucion(id, resolucion);
+            await listarSolicitudes();
+            return actualizada;
+        } catch (err: any) {
+            setError(err.message);
+            return null;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // ========== FILTRAR POR ESTADO ==========
     const listarPorEstado = async (estado: string): Promise<Solicitud[]> => {
         try {
             return await solicitudService.listarPorEstado(estado);
@@ -95,6 +152,7 @@ export function SolicitudProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    // ========== FILTRAR POR TIPO ==========
     const listarPorTipo = async (tipo: string): Promise<Solicitud[]> => {
         try {
             return await solicitudService.listarPorTipo(tipo);
@@ -104,15 +162,7 @@ export function SolicitudProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const obtenerSolicitud = async (id: number): Promise<Solicitud | null> => {
-        try {
-            return await solicitudService.obtenerSolicitud(id);
-        } catch (err: any) {
-            setError(err.message);
-            return null;
-        }
-    };
-
+    // ========== INICIALIZAR ==========
     useEffect(() => {
         if (isAuthenticated) {
             listarSolicitudes();
@@ -128,11 +178,13 @@ export function SolicitudProvider({ children }: { children: ReactNode }) {
                 error,
                 estadisticas,
                 crearSolicitud,
-                actualizarEstado,
                 listarSolicitudes,
+                obtenerSolicitud,
+                actualizarEstado,
+                actualizarResponsable,
+                actualizarResolucion,
                 listarPorEstado,
                 listarPorTipo,
-                obtenerSolicitud,
             }}
         >
             {children}

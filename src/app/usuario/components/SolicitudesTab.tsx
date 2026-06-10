@@ -3,10 +3,10 @@
 
 import { motion } from "framer-motion";
 import { ClipboardList, Plus, Search, Filter, ExternalLink, Eye } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSolicitudes } from "@/context/SolicitudContext";
 import { useAuth } from "@/context/AuthContext";
-import { Solicitud, EstadoSolicitud, TipoSolicitud } from "@/types/solicitud";
+import { Solicitud, EstadoSolicitud, TipoSolicitud, permisosSolicitudes, Rol } from "@/types/solicitud";
 import CrearSolicitudModal from "./CrearSolicitudModal";
 import DetalleSolicitudModal from "./DetalleSolicitudModal";
 
@@ -48,11 +48,18 @@ const prioridadLabels: Record<string, string> = {
 
 function SolicitudCard({
   solicitud,
-  onVerDetalle
+  onVerDetalle,
+  rol,
 }: {
   solicitud: Solicitud;
   onVerDetalle: (solicitud: Solicitud) => void;
+  rol: Rol;
 }) {
+  // Verificar si el rol puede ver este tipo de solicitud
+  const puedeVer = permisosSolicitudes.puedeVer[rol]?.includes(solicitud.tipoSolicitud) ?? true;
+
+  if (!puedeVer) return null;
+
   return (
     <div className="border border-stone-800 rounded-lg p-4 hover:bg-stone-900/50 transition-colors">
       <div className="flex items-start justify-between mb-3">
@@ -86,6 +93,11 @@ function SolicitudCard({
         <span className="uppercase tracking-widest">
           Creado: {new Date(solicitud.fechaCreacion).toLocaleDateString("es-PE")}
         </span>
+        {solicitud.responsableAsignado && (
+          <span className="uppercase tracking-widest">
+            Responsable: {solicitud.responsableAsignado}
+          </span>
+        )}
         {solicitud.jiraTicketId && (
           <a
             href={solicitud.jiraUrl}
@@ -118,26 +130,48 @@ export default function SolicitudesTab({ userId }: SolicitudesTabProps) {
   const [selectedSolicitud, setSelectedSolicitud] = useState<Solicitud | null>(null);
   const [filteredSolicitudes, setFilteredSolicitudes] = useState<Solicitud[]>([]);
 
+  const rol = user?.tipo as Rol || 'CLIENTE';
+
+  // Tipos que puede crear el usuario según su rol
+  const tiposPermitidosCrear = useMemo(() => {
+    return permisosSolicitudes.puedeCrear[rol] || [];
+  }, [rol]);
+
+  // Tipos que puede ver el usuario según su rol
+  const tiposPermitidosVer = useMemo(() => {
+    return permisosSolicitudes.puedeVer[rol] || [];
+  }, [rol]);
+
+  // Estados a los que puede cambiar el usuario
+  const puedeCambiarEstado = useMemo(() => {
+    return permisosSolicitudes.puedeCambiarEstado[rol] || [];
+  }, [rol]);
+
   useEffect(() => {
     const fetchData = async () => {
+      let data: Solicitud[] = [];
+
       if (filterEstado !== "TODOS" && filterTipo !== "TODOS") {
-        // Si ambos filtros están activos, necesitamos filtrar en cliente
         const porEstado = await listarPorEstado(filterEstado);
-        const filtradas = porEstado.filter(s => s.tipoSolicitud === filterTipo);
-        setFilteredSolicitudes(filtradas);
+        data = porEstado.filter(s => s.tipoSolicitud === filterTipo);
       } else if (filterEstado !== "TODOS") {
-        const data = await listarPorEstado(filterEstado);
-        setFilteredSolicitudes(data);
+        data = await listarPorEstado(filterEstado);
       } else if (filterTipo !== "TODOS") {
-        const data = await listarPorTipo(filterTipo);
-        setFilteredSolicitudes(data);
+        data = await listarPorTipo(filterTipo);
       } else {
-        setFilteredSolicitudes(solicitudes);
+        data = solicitudes;
       }
+
+      // Filtrar por tipos permitidos para el rol
+      if (tiposPermitidosVer.length > 0) {
+        data = data.filter(s => tiposPermitidosVer.includes(s.tipoSolicitud));
+      }
+
+      setFilteredSolicitudes(data);
     };
 
     fetchData();
-  }, [filterEstado, filterTipo, solicitudes, listarPorEstado, listarPorTipo]);
+  }, [filterEstado, filterTipo, solicitudes, listarPorEstado, listarPorTipo, tiposPermitidosVer]);
 
   // Filtro por búsqueda en cliente
   const displayedSolicitudes = filteredSolicitudes.filter((solicitud) => {
@@ -152,6 +186,14 @@ export default function SolicitudesTab({ userId }: SolicitudesTabProps) {
     listarSolicitudes();
   };
 
+  // Opciones de filtro de tipo según el rol
+  const tipoFilterOptions = [
+    { value: "TODOS", label: "Todos los tipos" },
+    ...(tiposPermitidosVer.includes('SERVICIO') ? [{ value: "SERVICIO", label: "Servicio" }] : []),
+    ...(tiposPermitidosVer.includes('INFORMACION') ? [{ value: "INFORMACION", label: "Información" }] : []),
+    ...(tiposPermitidosVer.includes('ACCESO') ? [{ value: "ACCESO", label: "Acceso" }] : []),
+  ];
+
   return (
     <motion.div
       key="solicitudes"
@@ -165,20 +207,22 @@ export default function SolicitudesTab({ userId }: SolicitudesTabProps) {
         <div className="flex items-center gap-2">
           <ClipboardList className="w-4 h-4 text-[#C6A96B]" />
           <h2 className="text-xs uppercase tracking-widest text-stone-400">
-            Mis Solicitudes
+            {rol === 'ADMINISTRADOR' ? 'Gestión de Solicitudes' : 'Mis Solicitudes'}
           </h2>
           <span className="text-xs text-stone-600 bg-stone-900 px-2 py-0.5 rounded-full">
-            {solicitudes.length}
+            {displayedSolicitudes.length}
           </span>
         </div>
 
-        <button
-          onClick={() => setShowCrearModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-[#C6A96B]/10 border border-[#C6A96B]/30 rounded text-[#C6A96B] text-xs uppercase tracking-widest hover:bg-[#C6A96B]/20 transition-colors"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          Nueva Solicitud
-        </button>
+        {tiposPermitidosCrear.length > 0 && (
+          <button
+            onClick={() => setShowCrearModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-[#C6A96B]/10 border border-[#C6A96B]/30 rounded text-[#C6A96B] text-xs uppercase tracking-widest hover:bg-[#C6A96B]/20 transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Nueva Solicitud
+          </button>
+        )}
       </div>
 
       {/* Filtros y búsqueda */}
@@ -213,10 +257,9 @@ export default function SolicitudesTab({ userId }: SolicitudesTabProps) {
             onChange={(e) => setFilterTipo(e.target.value)}
             className="bg-stone-900/50 border border-stone-800 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-[#C6A96B]/50"
           >
-            <option value="TODOS">Todos los tipos</option>
-            <option value="SERVICIO">Servicio</option>
-            <option value="INFORMACION">Información</option>
-            <option value="ACCESO">Acceso</option>
+            {tipoFilterOptions.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -233,6 +276,7 @@ export default function SolicitudesTab({ userId }: SolicitudesTabProps) {
               key={solicitud.id}
               solicitud={solicitud}
               onVerDetalle={setSelectedSolicitud}
+              rol={rol}
             />
           ))
         ) : (
@@ -244,7 +288,9 @@ export default function SolicitudesTab({ userId }: SolicitudesTabProps) {
             <p className="text-xs text-stone-600 max-w-xs">
               {searchTerm || filterEstado !== "TODOS" || filterTipo !== "TODOS"
                 ? "No se encontraron solicitudes con los filtros aplicados"
-                : "Haz clic en 'Nueva Solicitud' para crear tu primera solicitud"}
+                : tiposPermitidosCrear.length > 0
+                  ? "Haz clic en 'Nueva Solicitud' para crear tu primera solicitud"
+                  : "Tu rol no te permite crear solicitudes"}
             </p>
           </div>
         )}
@@ -255,8 +301,6 @@ export default function SolicitudesTab({ userId }: SolicitudesTabProps) {
         isOpen={showCrearModal}
         onClose={() => setShowCrearModal(false)}
         onSuccess={handleCrearSolicitud}
-        userId={userId}
-        userName={user ? `${user.nombre} ${user.apellido}` : undefined}
       />
 
       <DetalleSolicitudModal
@@ -267,7 +311,8 @@ export default function SolicitudesTab({ userId }: SolicitudesTabProps) {
           listarSolicitudes();
           setSelectedSolicitud(null);
         }}
-        canEdit={user?.tipo === 'ADMINISTRADOR'}
+        puedeCambiarEstado={puedeCambiarEstado}
+        rol={rol}
       />
     </motion.div>
   );

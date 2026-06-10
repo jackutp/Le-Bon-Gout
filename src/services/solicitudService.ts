@@ -13,12 +13,26 @@ class SolicitudService {
         };
     }
 
-    // Crear una nueva solicitud
+    // ========== CREAR SOLICITUD ==========
     async crearSolicitud(data: CrearSolicitudDTO): Promise<Solicitud> {
+        const body = {
+            tipoSolicitud: data.tipoSolicitud,
+            titulo: data.titulo,
+            descripcion: data.descripcion,
+            prioridad: data.prioridad,
+            fechaVencimiento: data.fechaVencimiento,
+            labels: data.labels,
+            assignee: data.responsableAsignado || data.assignee,
+            subtareas: data.subtareas,
+            usuarioSolicitante: data.usuarioSolicitante,
+            areaSolicitante: data.areaSolicitante,
+            responsableAsignado: data.responsableAsignado,
+        };
+
         const response = await fetch(`${API_BASE_URL}/solicitudes`, {
             method: 'POST',
             headers: this.getHeaders(),
-            body: JSON.stringify(data),
+            body: JSON.stringify(body),
         });
 
         if (!response.ok) {
@@ -33,7 +47,7 @@ class SolicitudService {
         return result.data;
     }
 
-    // Obtener todas las solicitudes
+    // ========== LISTAR SOLICITUDES ==========
     async listarSolicitudes(): Promise<Solicitud[]> {
         const response = await fetch(`${API_BASE_URL}/solicitudes`, {
             method: 'GET',
@@ -51,7 +65,7 @@ class SolicitudService {
         return result.data;
     }
 
-    // Obtener solicitud por ID
+    // ========== OBTENER SOLICITUD POR ID ==========
     async obtenerSolicitud(id: number): Promise<Solicitud> {
         const response = await fetch(`${API_BASE_URL}/solicitudes/${id}`, {
             method: 'GET',
@@ -69,7 +83,7 @@ class SolicitudService {
         return result.data;
     }
 
-    // Actualizar estado de una solicitud
+    // ========== ACTUALIZAR ESTADO (PENDIENTE, EN_PROCESO, COMPLETADA, RECHAZADA) ==========
     async actualizarEstado(id: number, estado: string): Promise<Solicitud> {
         const response = await fetch(`${API_BASE_URL}/solicitudes/${id}/estado?estado=${estado}`, {
             method: 'PUT',
@@ -87,7 +101,45 @@ class SolicitudService {
         return result.data;
     }
 
-    // Obtener solicitudes por estado
+    // ========== ACTUALIZAR RESPONSABLE ASIGNADO (SOLO ADMIN) ==========
+    async actualizarResponsable(id: number, responsable: string): Promise<Solicitud> {
+        const response = await fetch(`${API_BASE_URL}/solicitudes/${id}/responsable`, {
+            method: 'PUT',
+            headers: this.getHeaders(),
+            body: JSON.stringify({ responsable }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al actualizar el responsable');
+        }
+
+        const result: ApiResponse<Solicitud> = await response.json();
+        if (!result.success) {
+            throw new Error(result.message);
+        }
+        return result.data;
+    }
+
+    // ========== ACTUALIZAR RESOLUCIÓN (SOLO ADMIN) ==========
+    async actualizarResolucion(id: number, resolucion: string): Promise<Solicitud> {
+        const response = await fetch(`${API_BASE_URL}/solicitudes/${id}/resolucion`, {
+            method: 'PUT',
+            headers: this.getHeaders(),
+            body: JSON.stringify({ resolucion }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al actualizar la resolución');
+        }
+
+        const result: ApiResponse<Solicitud> = await response.json();
+        if (!result.success) {
+            throw new Error(result.message);
+        }
+        return result.data;
+    }
+
+    // ========== FILTRAR POR ESTADO ==========
     async listarPorEstado(estado: string): Promise<Solicitud[]> {
         const response = await fetch(`${API_BASE_URL}/solicitudes/estado/${estado}`, {
             method: 'GET',
@@ -105,7 +157,7 @@ class SolicitudService {
         return result.data;
     }
 
-    // Obtener solicitudes por tipo
+    // ========== FILTRAR POR TIPO ==========
     async listarPorTipo(tipo: string): Promise<Solicitud[]> {
         const response = await fetch(`${API_BASE_URL}/solicitudes/tipo/${tipo}`, {
             method: 'GET',
@@ -123,7 +175,7 @@ class SolicitudService {
         return result.data;
     }
 
-    // Obtener estadísticas
+    // ========== OBTENER ESTADÍSTICAS ==========
     async obtenerEstadisticas(): Promise<EstadisticasSolicitudes> {
         const response = await fetch(`${API_BASE_URL}/solicitudes/estadisticas`, {
             method: 'GET',
@@ -141,7 +193,7 @@ class SolicitudService {
         return result.data;
     }
 
-    // Obtener configuración (tipos, estados, etc.)
+    // ========== OBTENER CONFIGURACIÓN ==========
     async obtenerConfiguracion(): Promise<any> {
         const response = await fetch(`${API_BASE_URL}/solicitudes/configuracion`, {
             method: 'GET',

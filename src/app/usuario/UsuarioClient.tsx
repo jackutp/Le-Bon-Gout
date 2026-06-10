@@ -20,7 +20,6 @@ interface PerfilUsuario {
   nombre: string;
   apellido: string;
   email: string;
-  telefono: string;
   rol: Rol;
   fechaRegistro: string;
 }
@@ -105,7 +104,6 @@ function UsuarioContent() {
       nombre: user.nombre,
       apellido: user.apellido,
       email: user.email,
-      telefono: user.telefono || "—",
       rol: user.tipo as Rol,
       fechaRegistro: new Date().toISOString().split("T")[0],
     }
@@ -195,10 +193,6 @@ function UsuarioContent() {
                     <div>
                       <p className="text-xs uppercase tracking-widest text-stone-500">Correo</p>
                       <p className="text-sm text-white break-words">{perfil.email}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs uppercase tracking-widest text-stone-500">Teléfono</p>
-                      <p className="text-sm text-white">{perfil.telefono}</p>
                     </div>
                   </div>
                 </>

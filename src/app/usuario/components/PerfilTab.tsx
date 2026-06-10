@@ -14,7 +14,6 @@ interface PerfilUsuario {
     nombre: string;
     apellido: string;
     email: string;
-    telefono: string;
     rol: Rol;
     fechaRegistro: string;
 }
@@ -88,10 +87,6 @@ export default function PerfilTab({ perfil }: PerfilTabProps) {
                             <dd className="text-sm text-white font-medium">{perfil.email}</dd>
                         </div>
                         <div className="py-3.5 border-b border-stone-800/60">
-                            <dt className="text-xs uppercase tracking-widest text-stone-500 mb-0.5">Teléfono</dt>
-                            <dd className="text-sm text-white font-medium">{perfil.telefono || "—"}</dd>
-                        </div>
-                        <div className="py-3.5 border-b border-stone-800/60">
                             <dt className="text-xs uppercase tracking-widest text-stone-500 mb-0.5">Rol</dt>
                             <dd className="text-sm text-white font-medium">{rolLabels[perfil.rol]}</dd>
                         </div>
@@ -113,7 +108,6 @@ export default function PerfilTab({ perfil }: PerfilTabProps) {
                     <div className="sm:hidden">
                         <InfoRow icon={User} label="Nombre completo" value={`${perfil.nombre} ${perfil.apellido}`} />
                         <InfoRow icon={Mail} label="Correo Electrónico" value={perfil.email} />
-                        <InfoRow icon={Phone} label="Teléfono" value={perfil.telefono || "—"} />
                         <InfoRow icon={BadgeCheck} label="Rol / Puesto" value={rolLabels[perfil.rol]} />
                         <InfoRow
                             icon={Calendar}
